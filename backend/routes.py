@@ -20,7 +20,7 @@ def add_employee():
     try:
         data = request.get_json()
 
-        # Extract data from the JSON payload
+        
         firstname = data.get('firstname')
         midint = data.get('midint')  
         lastname = data.get('lastname')
@@ -34,10 +34,10 @@ def add_employee():
         bonus = data.get('bonus')
         commission = data.get('commission')
 
-        # Convert hiredate string to datetime
+        
         hiredate = datetime.fromisoformat(hiredate_str)
 
-        # Create a new Employee instance
+       
         new_employee = Employee(
             firstname=firstname,
             midint=midint,
@@ -53,7 +53,7 @@ def add_employee():
             commission=commission
         )
 
-        # Add the new employee to the database
+        e
         db.session.add(new_employee)
         db.session.commit()
 
@@ -67,14 +67,11 @@ def add_department():
     try:
         data = request.get_json()
 
-        # Extract data from the JSON payload
+       
         departmentName= data.get('departmentName')
         departmentHead = data.get('departmentHead')  
         Location = data.get('Location')
 
-        
-
-        # Create a new Department instance
         new_department= Department(
             departmentName=departmentName,
             departmentHead=departmentHead,
@@ -82,7 +79,6 @@ def add_department():
           
         )
 
-        # Add the new employee to the database
         db.session.add(new_department)
         db.session.commit()
 
