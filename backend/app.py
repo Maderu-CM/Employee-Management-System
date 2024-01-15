@@ -27,8 +27,8 @@ class Employee(db.Model):
 
     id = db.Column(db.Integer, nullable=False, unique=True, autoincrement=True, primary_key=True)
     firstname = db.Column(db.String(30), nullable=False)
-    midint = db.Column(db.String(30), unique=True, nullable=False)
-    lastname = db.Column(db.String(30), unique=True, nullable=False)
+    midint = db.Column(db.String(30), nullable=False)
+    lastname = db.Column(db.String(30), unique=False, nullable=False)
     gender = db.Column(db.String(30), nullable=False) 
     contact = db.Column(db.String(20), unique=True, nullable=False)
     departmentnumber = db.Column(db.String(20), db.ForeignKey('department.departmentnumber'), nullable=False)
