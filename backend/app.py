@@ -53,8 +53,8 @@ class Department(db.Model):
 
 
 
-    
-
+   
+import routes
 
 
 if __name__ == '__main__':
