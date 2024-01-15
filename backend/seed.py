@@ -6,7 +6,7 @@ fake = Faker()
 
 def create_fake_department(count=6):
     with app.app_context():
-        # Define specific departments with unique department numbers
+     
         departments_data = [
             {'name': 'Guard', 'number': 1},
             {'name': 'Garage', 'number': 2},
@@ -29,7 +29,7 @@ def create_fake_department(count=6):
 
 def create_fake_employee(count=20):
     with app.app_context():
-        # Retrieve department numbers for the specified departments
+      
         department_numbers = [1, 2, 3, 4, 5, 6]
 
         for _ in range(count):
