@@ -1,6 +1,7 @@
-from flask import jsonify, request
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from app import db, Employee, Department, app
 from flask_cors import CORS
+
 
 
 from datetime import datetime
@@ -85,10 +86,159 @@ def add_department():
         return jsonify({'message': 'New Department added successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+#view employees 
+@app.route('/employees', methods=['GET'])
+def view_employees():
+    try:
+        employees = Employee.query.all()
 
+        employee_list = []
+        for employee in employees:
+            employee_data = {
+                
+                'firstname': employee.firstname,
+                'midint': employee.midint,
+                'lastname': employee.lastname,
+                'contact': employee.contact
+            }
+            employee_list.append(employee_data)
 
+        response_data = {'status': 'success', 'employees': employee_list}
+        return jsonify(response_data)
+    
+    except Exception as e:
+        response_data = {'status': 'error', 'message': str(e)}
+        return jsonify(response_data)
+    
+#view details of a specific user.
+@app.route('/employees/<int:employee_id>', methods=['GET'])
+def view_employee(employee_id):
+    try:
+        employee = Employee.query.get(employee_id)
 
+        if employee:
+            employee_data = {
+                
+                'firstname': employee.firstname,
+                'midint': employee.midint,
+                'lastname': employee.lastname,
+                'gender': employee.gender,
+                'contact': employee.contact,
+                'departmentnumber': employee.departmentnumber,
+                'hiredate': employee.hiredate.strftime('%d-%m-%Y-'),
+                'educationlevel': employee.educationlevel,
+                'job': employee.job,
+                'salary': employee.salary,
+                'bonus': employee.bonus,
+                'commission': employee.commission
+            }
+            response_data = {'status': 'success', 'employee': employee_data}
+        else:
+            response_data = {'status': 'error', 'message': 'Employee not found'}
 
+        return jsonify(response_data)
+    
+    except Exception as e:
+        response_data = {'status': 'error', 'message': str(e)}
+        return jsonify(response_data)
+    
+#Retrieve and update employee's details
+@app.route('/edit_employee/<int:employee_id>', methods=['GET', 'POST'])
+def edit_employee(employee_id):
+    try:
+        employee = Employee.query.get(employee_id)
+
+        if request.method == 'GET':
+            if employee:
+                return render_template('employee.html', employee=employee)
+            else:
+                return jsonify({'status': 'error', 'message': 'Employee not found'}), 404
+
+        elif request.method == 'POST':
+            if employee:
+                try:
+                    json_data = request.get_json()
+
+                    if json_data:
+                        # Convert hiredate string to datetime object
+                        hiredate_str = json_data.get('hiredate')
+                        if hiredate_str:
+                            employee.hiredate = datetime.strptime(hiredate_str, '%Y-%m-%d')
+
+                        # Update other fields
+                        employee.firstname = json_data.get('firstname')
+                        employee.midint = json_data.get('midint')
+                        employee.lastname = json_data.get('lastname')
+                        employee.gender = json_data.get('gender')
+                        employee.contact = json_data.get('contact')
+                        employee.departmentnumber = json_data.get('departmentnumber')
+                        employee.educationlevel = json_data.get('educationlevel')
+                        employee.job = json_data.get('job')
+                        employee.salary = json_data.get('salary')
+                        employee.bonus = json_data.get('bonus')
+                        employee.commission = json_data.get('commission')
+
+                        db.session.commit()
+
+                        return jsonify({'status': 'success', 'message': 'Employee updated successfully'}), 200
+                    else:
+                        return jsonify({'status': 'error', 'message': 'Invalid JSON data'}), 400
+                except Exception as e:
+                    return jsonify({'status': 'error', 'message': str(e)}), 500
+            else:
+                return jsonify({'status': 'error', 'message': 'Employee not found'}), 404
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+#Delete an employee
+@app.route('/delete_employee/<int:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+    try:
+        employee = Employee.query.get(employee_id)
+
+        if employee:
+            db.session.delete(employee)
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': 'Employee deleted successfully'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Employee not found'}), 404
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+#search for employees based on a specific criteria
+@app.route('/search_employees', methods=['GET'])
+def search_employees():
+    try:
+        # filter parameters
+        filters = {
+            'firstname': request.args.get('firstname', ''),
+            'lastname': request.args.get('lastname', ''),
+            'departmentname': request.args.get('departmentname', ''),
+            'gender': request.args.get('gender', ''),
+            'job': request.args.get('job', ''),
+            'educationlevel': request.args.get('educationlevel', '')
+        }
+
+        query = Employee.query.filter_by(**filters)
+        employees = query.all()
+
+        # results
+        employee_list = []
+        for employee in employees:
+            employee_data = {
+                
+                'firstname': employee.firstname,
+                'lastname': employee.lastname             
+                            }
+            employee_list.append(employee_data)
+
+        return jsonify({'status': 'success', 'employees': employee_list}), 200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500  
 
 if __name__ == '__main__':
     app.run(debug=True)
