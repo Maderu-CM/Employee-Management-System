@@ -24,12 +24,11 @@
         <label for="contact">Contact:</label>
         <input type="text" name="contact" value="{{ employee.contact }}" required>
 
-        <label for="departmentnumber">Department Number:</label>
-        <input type="text" name="departmentnumber" value="{{ employee.departmentnumber }}" required>
+        <label for="departmentname">Department Name:</label>
+        <input type="text" name="departmentname" value="{{ employee.department.departmentName }}" required>
 
         <label for="hiredate">Hire Date:</label>
         <input type="date" name="hiredate" value="{{ employee.hiredate | default('') }}" required>
-
 
         <label for="educationlevel">Education Level:</label>
         <input type="text" name="educationlevel" value="{{ employee.educationlevel }}" required>
@@ -46,10 +45,8 @@
         <label for="commission">Commission:</label>
         <input type="text" name="commission" value="{{ employee.commission }}" required>
 
-
         <button type="submit">UPDATE</button>
     </form>
 </body>
-
 
 </html>

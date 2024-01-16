@@ -125,7 +125,7 @@ def view_employee(employee_id):
                 'lastname': employee.lastname,
                 'gender': employee.gender,
                 'contact': employee.contact,
-                'departmentnumber': employee.departmentnumber,
+                'departmentname': employee.department.departmentName,
                 'hiredate': employee.hiredate.strftime('%d-%m-%Y-'),
                 'educationlevel': employee.educationlevel,
                 'job': employee.job,
@@ -172,7 +172,14 @@ def edit_employee(employee_id):
                         employee.lastname = json_data.get('lastname')
                         employee.gender = json_data.get('gender')
                         employee.contact = json_data.get('contact')
-                        employee.departmentnumber = json_data.get('departmentnumber')
+
+                        # Access departmentName through the relationship
+                        department_name = json_data.get('departmentname')
+                        if department_name:
+                            department = Department.query.filter_by(departmentName=department_name).first()
+                            if department:
+                                employee.department = department
+
                         employee.educationlevel = json_data.get('educationlevel')
                         employee.job = json_data.get('job')
                         employee.salary = json_data.get('salary')
@@ -239,6 +246,68 @@ def search_employees():
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500  
+
+
+#fetching departments
+@app.route('/departments', methods=['GET'])
+def get_departments():
+    try:
+       
+        departments = Department.query.all()
+
+        department_list = [{'departmentnumber': department.departmentnumber, 'departmentName': department.departmentName} for department in departments]
+
+        return jsonify({'status': 'success', 'departments': department_list}), 200
+    except Exception as e:
+        
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+    #deleting a department
+@app.route('/delete_department/<int:departmentNumber>', methods=['DELETE'])
+def delete_department(departmentNumber):
+    try:
+        department = Department.query.get(departmentNumber)
+
+        if department:
+            db.session.delete(department)
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': 'Department deleted successfully'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+#Retrieve and update department's details
+@app.route('/edit_department/<int:departmentNumber>', methods=['GET', 'POST'])
+def edit_department(departmentNumber):
+    try:
+        department = Department.query.get(departmentNumber)
+
+        if request.method == 'GET':
+            if department:
+                return render_template('department.html', department=department)
+            else:
+                return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+
+        elif request.method == 'POST':
+            if department:
+                try:
+                    # Access form data using request.form
+                    department.departmentName = request.form.get('departmentname')
+                    department.departmentHead = request.form.get('departmenthead')
+                    department.Location = request.form.get('location')
+
+                    db.session.commit()
+
+                    return jsonify({'status': 'success', 'message': 'Department updated successfully'}), 200
+                except Exception as e:
+                    return jsonify({'status': 'error', 'message': str(e)}), 500
+            else:
+                return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
