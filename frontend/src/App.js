@@ -5,9 +5,10 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard.jsx';
 import About from './pages/About.jsx';
 import AddEmployee from './pages/AddEmployee.jsx';
-import Comment from './pages/Comment.jsx';
-import Product from './pages/Product.jsx';
-import ProductList from './pages/ProductList.jsx';
+
+import AddDepartment from './pages/AddDepartment.jsx';
+import ViewDepartment from './pages/ViewDepartment.jsx';
+import ViewEmployees from './pages/ViewEmployees.jsx';
 
 const App = () => {
   return (
@@ -17,10 +18,10 @@ const App = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
-          <Route path="/comment" element={<Comment />} />
+          <Route path="/viewemployees" element={<ViewEmployees/>} />
           <Route path="/addemployee" element={<AddEmployee />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/productList" element={<ProductList />} />
+          <Route path="/adddepartment" element={<AddDepartment />} />
+          <Route path="/viewdepartment" element={<ViewDepartment />} />
         </Routes>
       </Sidebar>
     </BrowserRouter>

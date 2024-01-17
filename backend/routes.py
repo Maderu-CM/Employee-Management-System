@@ -29,19 +29,19 @@ def add_employee():
         commission = data.get('commission')
 
         try:
-            # Parse hiredate string into a datetime object
+            
             hiredate = datetime.strptime(hiredate_str, '%d-%m-%Y')
         except ValueError as e:
             return jsonify({'error': f'Invalid datetime format: {str(e)}'}), 400
 
-        # Look up department based on correct property name (departmentName)
+        
         department = Department.query.filter_by(
             departmentName=departmentname).first()
 
         if not department:
             return jsonify({'error': 'Department not found'}), 404
 
-        # Extract department number from the retrieved department
+        
         departmentnumber = department.departmentnumber
 
         new_employee = Employee(
@@ -172,7 +172,7 @@ def edit_employee(employee_id):
                     json_data = request.get_json()
 
                     if json_data:
-                        # Convert hiredate string to datetime object
+                        
                         hiredate_str = json_data.get('hiredate')
                         if hiredate_str:
                             employee.hiredate = datetime.strptime(

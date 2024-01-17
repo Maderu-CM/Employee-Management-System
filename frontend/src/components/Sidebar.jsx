@@ -5,8 +5,8 @@ import {
     FaUserAlt,
     FaInfoCircle
     ,
-    FaCommentAlt,
-    FaShoppingBag,
+    FaUsers,
+    FaSitemap ,
     FaThList
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
@@ -33,20 +33,21 @@ const Sidebar = ({ children }) => {
             icon: <FaUserAlt />
         },
         {
-            path: "/comment",
-            name: "Comment",
-            icon: <FaCommentAlt />
+            path: "/viewemployees",
+            name: "View Employees",
+            icon: <FaUsers />
         },
         {
-            path: "/product",
-            name: "Product",
-            icon: <FaShoppingBag />
-        },
-        {
-            path: "/productList",
-            name: "Product List",
+            path: "/adddepartment",
+            name: "Add Department",
             icon: <FaThList />
+        },
+        {
+            path: "/viewdepartment",
+            name: "View Department",
+            icon: <FaSitemap />
         }
+       
     ]
     return (
         <div className="container">
