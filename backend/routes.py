@@ -29,7 +29,7 @@ def add_employee():
         commission = data.get('commission')
 
         try:
-            # Parse the date in 'yyyy-mm-dd' format
+            
             hiredate = datetime.strptime(hiredate_str, '%Y-%m-%d')
         except ValueError as e:
             return jsonify({'error': f'Invalid datetime format: {str(e)}'}), 400
@@ -84,7 +84,7 @@ def add_department():
         db.session.add(new_department)
         db.session.commit()
 
-        return jsonify({'message': 'New Department added successfully'}), 201
+        return jsonify({'message': 'New Department registered successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -175,14 +175,14 @@ def edit_employee(employee_id):
                             employee.hiredate = datetime.strptime(
                                 hiredate_str, '%Y-%m-%d')
 
-                        # Update other fields
+                        
                         employee.firstname = json_data.get('firstname')
                         employee.midint = json_data.get('midint')
                         employee.lastname = json_data.get('lastname')
                         employee.gender = json_data.get('gender')
                         employee.contact = json_data.get('contact')
 
-                        # Access departmentName through the relationship
+                       
                         department_name = json_data.get('departmentname')
                         if department_name:
                             department = Department.query.filter_by(
