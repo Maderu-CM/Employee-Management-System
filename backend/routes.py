@@ -29,19 +29,16 @@ def add_employee():
         commission = data.get('commission')
 
         try:
-            
-            hiredate = datetime.strptime(hiredate_str, '%d-%m-%Y')
+            # Parse the date in 'yyyy-mm-dd' format
+            hiredate = datetime.strptime(hiredate_str, '%Y-%m-%d')
         except ValueError as e:
             return jsonify({'error': f'Invalid datetime format: {str(e)}'}), 400
 
-        
-        department = Department.query.filter_by(
-            departmentName=departmentname).first()
+        department = Department.query.filter_by(departmentName=departmentname).first()
 
         if not department:
             return jsonify({'error': 'Department not found'}), 404
 
-        
         departmentnumber = department.departmentnumber
 
         new_employee = Employee(
@@ -65,8 +62,8 @@ def add_employee():
         return jsonify({'message': 'New Employee added successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
+    
+    
 # Add a department
 @app.route('/add_department', methods=['POST'])
 def add_department():

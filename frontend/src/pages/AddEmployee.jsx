@@ -20,7 +20,7 @@ function AddEmployee() {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        // Fetch departments when the component mounts
+       
         fetchDepartments();
     }, []);
 
@@ -43,17 +43,14 @@ function AddEmployee() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        // Format the hiredate to dd-mm-yyyy
-        const formattedValue = name === 'hiredate' ? value.split('-').reverse().join('-') : value;
+        
+        const formattedValue = name === 'hiredate' ? value : value;
 
         setFormData({ ...formData, [name]: formattedValue });
     };
 
     function handleSubmit(event) {
         event.preventDefault();
-
-        const formattedDate = formData.hiredate.split('-').reverse().join('-');
-        setFormData({ ...formData, hiredate: formattedDate });
 
         fetch('http://127.0.0.1:5000/add_employee', {
             method: 'POST',
@@ -103,8 +100,8 @@ function AddEmployee() {
                 {successMessage && <div className="alert alert-success">{successMessage}</div>}
                 {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
             </div>
-            <div style={{ width: '50%', alignSelf: 'center', marginTop: '20px' }}>
 
+            <div style={{ width: '50%', alignSelf: 'center', marginTop: '20px' }}>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3 row">
                         <label htmlFor="firstname" className="col-sm-2 col-form-label">
@@ -212,6 +209,31 @@ function AddEmployee() {
                     </div>
 
                     <div className="mb-3 row">
+    <label htmlFor="educationlevel" className="col-sm-2 col-form-label">
+        Education Level
+    </label>
+    <div className="col-sm-4">
+        <select
+            className="form-select"
+            id="educationlevel"
+            name="educationlevel"
+            value={formData.educationlevel}
+            onChange={handleInputChange}
+            aria-label="Default select example"
+        >
+            <option value="" selected>
+                Select Education Level
+            </option>
+            <option value="PHD">PHD</option>
+            <option value="Masters">Masters</option>
+            <option value="Degree">Degree</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Certificate">Certificate</option>
+        </select>
+    </div>
+</div>
+
+                    <div className="mb-3 row">
                         <label htmlFor="hiredate" className="col-sm-2 col-form-label">
                             Hire Date
                         </label>
@@ -285,18 +307,17 @@ function AddEmployee() {
                                 onChange={handleInputChange}
                             />
                         </div>
+                    </div>
 
-                        <div className="mb-3 row" style={{ marginBottom: '5px' }}>
-                            <div className="col-sm-6 offset-sm-2">
-                                <button type="submit" className="btn btn-primary" style={{ transition: 'background-color 0.3s' }}>
-                                    Add Employee
-                                </button>
-                            </div>
+                    <div className="mb-3 row" style={{ marginBottom: '5px' }}>
+                        <div className="col-sm-6 offset-sm-2">
+                            <button type="submit" className="btn btn-primary" style={{ transition: 'background-color 0.3s' }}>
+                                Add Employee
+                            </button>
                         </div>
                     </div>
                 </form>
             </div>
-
         </div>
     );
 }
