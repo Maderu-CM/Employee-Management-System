@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-    FaTh,
+
     FaBars,
     FaUserAlt,
     FaInfoCircle
     ,
     FaUsers,
-    FaSitemap ,
+    FaSitemap,
     FaThList
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
@@ -16,11 +16,7 @@ const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
     const menuItem = [
-        {
-            path: "/",
-            name: "Dashboard",
-            icon: <FaTh />
-        },
+
         {
             path: "/about",
             name: "About",
@@ -47,7 +43,7 @@ const Sidebar = ({ children }) => {
             name: "View Department",
             icon: <FaSitemap />
         }
-       
+
     ]
     return (
         <div className="container">
