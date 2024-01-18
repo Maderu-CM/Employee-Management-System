@@ -92,7 +92,7 @@ function AddEmployee() {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ marginTop: '20px', color: 'blue' }}>
+            <div style={{ marginTop: '10px', color: 'blue' }}>
                 <h2>Add Employee</h2>
             </div>
 
@@ -103,6 +103,7 @@ function AddEmployee() {
 
             <div style={{ width: '50%', alignSelf: 'center', marginTop: '20px' }}>
                 <form onSubmit={handleSubmit}>
+
                     <div className="mb-3 row">
                         <label htmlFor="firstname" className="col-sm-2 col-form-label">
                             First Name

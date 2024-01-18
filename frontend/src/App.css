@@ -5,17 +5,21 @@
 }
 .container{
   display:flex;
+  margin-left: 0;
 }
 main{
   width: 100%;
-  padding: 20px;
+  padding: 10px;
 }
 .sidebar{
-  background: #000;
-  color: #fff;
+  background: #0a23b6;
+  color: #e01010;
   height: 100vh;
   width: 200px;
   transition: all 0.5s;
+ 
+  margin-left: 0;
+ 
 }
 .top_section{
   display: flex;
@@ -28,7 +32,7 @@ main{
 .bars{
   display: flex;
   font-size: 25px;
-  margin-left: 50px;
+  margin-left: 40px;
 }
 .link{
   display: flex;

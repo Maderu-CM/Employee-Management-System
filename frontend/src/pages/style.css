@@ -16,3 +16,7 @@
 .input-group-append .btn.search-button:hover {
     background-color: #72ee0d !important; 
 }
+.about{
+    text-align: center;
+    color: blue;
+}
