@@ -271,7 +271,7 @@ def get_departments():
         departments = Department.query.all()
 
         department_list = [{'departmentnumber': department.departmentnumber,
-                            'departmentName': department.departmentName} for department in departments]
+                            'departmentName': department.departmentName,'departmentHead':department.departmentHead, 'location': department.Location} for department in departments]
 
         return jsonify({'status': 'success', 'departments': department_list}), 200
     except Exception as e:
