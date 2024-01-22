@@ -1,33 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import './style.css'
+import './style.css';
 
 const ViewEmployees = () => {
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMorePages, setHasMorePages] = useState(true);
 
-    const fetchAllEmployees = () => {
-        fetch('http://127.0.0.1:5000/employees')
+    const fetchEmployees = (page) => {
+        fetch(`http://127.0.0.1:5000/employees?page=${page}&pageSize=10`)
             .then((response) => response.json())
             .then((data) => {
                 if (data.status === 'success') {
                     setEmployees(data.employees);
                     setError('');
+                    // Check if there are more pages
+                    setHasMorePages(data.employees.length === 10);
                 } else {
                     setEmployees([]);
                     setError('Error fetching employees');
+                    setHasMorePages(false);
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
                 setEmployees([]);
                 setError('Error fetching employees');
+                setHasMorePages(false);
             });
     };
 
-    useEffect(() => {
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        fetchEmployees(newPage);
+    };
 
-        fetchAllEmployees();
-    }, []);
+    useEffect(() => {
+        fetchEmployees(currentPage);
+    }, [currentPage]);
+
     return (
         <div>
             <div>
@@ -40,8 +51,6 @@ const ViewEmployees = () => {
                     </div>
                 </div>
             </div>
-
-
 
             {error && <div className="alert alert-danger">{error}</div>}
 
@@ -65,6 +74,24 @@ const ViewEmployees = () => {
                     ))}
                 </tbody>
             </table>
+
+            <div>
+                <button
+                    className="btn btn-secondary"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Previous Page
+                </button>
+                <span className="mx-2">Page {currentPage}</span>
+                <button
+                    className="btn btn-secondary"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!hasMorePages}
+                >
+                    Next Page
+                </button>
+            </div>
         </div>
     );
 };
