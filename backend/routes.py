@@ -94,14 +94,14 @@ def add_department():
 @app.route('/employees', methods=['GET'])
 def view_employees():
     try:
-        # Retrieve page number and page size from query parameters
+       
         page = request.args.get('page', default=1, type=int)
         page_size = request.args.get('pageSize', default=10, type=int)
 
-        # Calculate the offset based on the page number and page size
+        
         offset = (page - 1) * page_size
 
-        # Query the database with pagination
+      
         employees = Employee.query.offset(offset).limit(page_size).all()
 
         employee_list = []

@@ -22,6 +22,7 @@ const App = () => {
           <Route path="/addemployee" element={<AddEmployee />} />
           <Route path="/adddepartment" element={<AddDepartment />} />
           <Route path="/viewdepartment" element={<ViewDepartment />} />
+         
         </Routes>
       </Sidebar>
     </BrowserRouter>
