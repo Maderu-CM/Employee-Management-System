@@ -62,7 +62,7 @@ const ViewEmployees = () => {
                     if (data.status === 'success') {
                         // Set the notification to true for a short duration
                         setDeleteSuccessNotification(true);
-                        setTimeout(() => setDeleteSuccessNotification(false), 3000);
+                        setTimeout(() => setDeleteSuccessNotification(false), 2000);
 
                         // Reload the employee list after successful deletion
                         fetchEmployees(currentPage);
@@ -83,7 +83,7 @@ const ViewEmployees = () => {
 
     return (
         <div>
-            {/* Notification */}
+            
             {deleteSuccessNotification && (
                 <div className="alert alert-success">
                     Employee deleted successfully!

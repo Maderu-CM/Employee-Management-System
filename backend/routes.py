@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from app import db, Employee, Department, app
 from flask_cors import CORS
@@ -29,12 +30,13 @@ def add_employee():
         commission = data.get('commission')
 
         try:
-            
+
             hiredate = datetime.strptime(hiredate_str, '%Y-%m-%d')
         except ValueError as e:
             return jsonify({'error': f'Invalid datetime format: {str(e)}'}), 400
 
-        department = Department.query.filter_by(departmentName=departmentname).first()
+        department = Department.query.filter_by(
+            departmentName=departmentname).first()
 
         if not department:
             return jsonify({'error': 'Department not found'}), 404
@@ -62,8 +64,8 @@ def add_employee():
         return jsonify({'message': 'New Employee added successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-    
+
+
 # Add a department
 @app.route('/add_department', methods=['POST'])
 def add_department():
@@ -94,20 +96,18 @@ def add_department():
 @app.route('/employees', methods=['GET'])
 def view_employees():
     try:
-       
+
         page = request.args.get('page', default=1, type=int)
         page_size = request.args.get('pageSize', default=10, type=int)
 
-        
         offset = (page - 1) * page_size
 
-      
         employees = Employee.query.offset(offset).limit(page_size).all()
 
         employee_list = []
         for employee in employees:
             employee_data = {
-                'id' : employee.id,
+                'id': employee.id,
                 'firstname': employee.firstname,
                 'midint': employee.midint,
                 'lastname': employee.lastname,
@@ -176,20 +176,18 @@ def edit_employee(employee_id):
                     json_data = request.get_json()
 
                     if json_data:
-                        
+
                         hiredate_str = json_data.get('hiredate')
                         if hiredate_str:
                             employee.hiredate = datetime.strptime(
                                 hiredate_str, '%Y-%m-%d')
 
-                        
                         employee.firstname = json_data.get('firstname')
                         employee.midint = json_data.get('midint')
                         employee.lastname = json_data.get('lastname')
                         employee.gender = json_data.get('gender')
                         employee.contact = json_data.get('contact')
 
-                       
                         department_name = json_data.get('departmentname')
                         if department_name:
                             department = Department.query.filter_by(
@@ -271,37 +269,50 @@ def search_employees():
 
 
 # fetching departments
+
+
 @app.route('/departments', methods=['GET'])
 def get_departments():
     try:
-
         departments = Department.query.all()
 
-        department_list = [{'departmentnumber': department.departmentnumber,
-                            'departmentName': department.departmentName,'departmentHead':department.departmentHead, 'location': department.Location} for department in departments]
+        department_list = []
+        for department in departments:
+            department_data = {
+                'departmentnumber': department.departmentnumber,
+                'departmentName': department.departmentName,
+                'departmentHead': department.departmentHead,
+                'Location': department.Location
+            }
+            department_list.append(department_data)
 
         return jsonify({'status': 'success', 'departments': department_list}), 200
     except Exception as e:
-
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     # deleting a department
 
 
-@app.route('/delete_department/<int:departmentNumber>', methods=['DELETE'])
-def delete_department(departmentNumber):
+@app.route('/delete_department/<int:departmentnumber>', methods=['DELETE'])
+def delete_department(departmentnumber):
     try:
-        department = Department.query.get(departmentNumber)
+        department = Department.query.get(departmentnumber)
 
         if department:
+            # Delete the associated employees
+            for employee in department.employees:
+                db.session.delete(employee)
+
+            # Delete the department
             db.session.delete(department)
             db.session.commit()
 
-            return jsonify({'status': 'success', 'message': 'Department deleted successfully'}), 200
+            return jsonify({'status': 'success', 'message': 'Department and associated employees deleted successfully'}), 200
         else:
             return jsonify({'status': 'error', 'message': 'Department not found'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 # Retrieve and update department's details
 
@@ -335,6 +346,25 @@ def edit_department(departmentNumber):
             else:
                 return jsonify({'status': 'error', 'message': 'Department not found'}), 404
 
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+    # employees count
+
+
+@app.route('/department_employees_count/<int:departmentnumber>', methods=['GET'])
+def get_department_employees_count(departmentnumber):
+    try:
+        department = Department.query.get(departmentnumber)
+
+        if department:
+            # Get the number of employees associated with the department
+            employees_count = len(
+                department.employees) if department.employees else 0
+
+            return jsonify({'status': 'success', 'employees_count': employees_count}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Department not found'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
