@@ -25,42 +25,41 @@ const ViewDepartment = () => {
             });
     };
 
-    const handleDeleteDepartment = (departmentnumber, employeeCount) => {
-        if (window.confirm(`Are you sure you want to delete this department and its ${employeeCount} employees?`)) {
+    const handleDeleteDepartment = async (departmentnumber) => {
+        if (window.confirm('Are you sure you want to delete this department and its employees?')) {
             if (!departmentnumber) {
                 console.error('departmentnumber is undefined');
                 return;
             }
 
-            fetch(`http://127.0.0.1:5000/delete_department/${departmentnumber}`, {
-                method: 'DELETE',
-            })
-                .then((response) => {
-                    console.log('Delete response status:', response.status);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Delete response data:', data);
-
-                    if (data.status === 'success') {
-                        // Set the notification to true for a short duration
-                        setDeleteSuccessNotification(true);
-                        setTimeout(() => setDeleteSuccessNotification(false), 2000);
-
-                        // Reload the department list after successful deletion
-                        fetchAllDepartments();
-                    } else {
-                        alert(`Error: ${data.message}`);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Fetch error:', error);
-                    alert('Error during the fetch request');
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/delete_department/${departmentnumber}`, {
+                    method: 'DELETE',
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Set the notification to true for a short duration
+                    setDeleteSuccessNotification(true);
+                    setTimeout(() => setDeleteSuccessNotification(false), 2000);
+
+                    // Wait for a short duration to allow the server to update the data
+                    await new Promise((resolve) => setTimeout(resolve, 500));
+
+                    // Reload the department list after successful deletion
+                    fetchAllDepartments();
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Error during the fetch request');
+            }
         }
     };
 
@@ -99,7 +98,7 @@ const ViewDepartment = () => {
                                 <button className="btn btn-primary ml-2">EDIT</button>
                                 <button
                                     className="btn btn-danger ml-2"
-                                    onClick={() => handleDeleteDepartment(department.departmentnumber, department.employees ? department.employees.length : 0)}
+                                    onClick={() => handleDeleteDepartment(department.departmentnumber)}
                                 >
                                     DELETE
                                 </button>
