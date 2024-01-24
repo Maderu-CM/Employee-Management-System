@@ -349,25 +349,7 @@ def edit_department(departmentNumber):
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-    # employees count
-
-
-@app.route('/department_employees_count/<int:departmentnumber>', methods=['GET'])
-def get_department_employees_count(departmentnumber):
-    try:
-        department = Department.query.get(departmentnumber)
-
-        if department:
-            # Get the number of employees associated with the department
-            employees_count = len(
-                department.employees) if department.employees else 0
-
-            return jsonify({'status': 'success', 'employees_count': employees_count}), 200
-        else:
-            return jsonify({'status': 'error', 'message': 'Department not found'}), 404
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
