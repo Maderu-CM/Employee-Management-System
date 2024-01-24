@@ -6,6 +6,7 @@ const ViewEmployees = () => {
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMorePages, setHasMorePages] = useState(true);
+    const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
 
     const fetchEmployees = (page) => {
         fetch(`http://127.0.0.1:5000/employees?page=${page}&pageSize=10`)
@@ -37,28 +38,32 @@ const ViewEmployees = () => {
 
     const handleDeleteEmployee = (employeeId) => {
         console.log('Employee ID:', employeeId);
-    
+
         if (window.confirm('Are you sure you want to delete this employee?')) {
             if (!employeeId) {
                 console.error('Employee ID is undefined');
                 return;
             }
-    
+
             fetch(`http://127.0.0.1:5000/delete_employee/${employeeId}`, {
                 method: 'DELETE',
             })
                 .then((response) => {
-                    console.log('Delete response status:', response.status); // Add this line for additional info
-    
+                    console.log('Delete response status:', response.status);
+
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then((data) => {
-                    console.log('Delete response data:', data); // Add this line for additional info
-    
+                    console.log('Delete response data:', data);
+
                     if (data.status === 'success') {
+                        // Set the notification to true for a short duration
+                        setDeleteSuccessNotification(true);
+                        setTimeout(() => setDeleteSuccessNotification(false), 3000);
+
                         // Reload the employee list after successful deletion
                         fetchEmployees(currentPage);
                     } else {
@@ -71,13 +76,20 @@ const ViewEmployees = () => {
                 });
         }
     };
-    
+
     useEffect(() => {
         fetchEmployees(currentPage);
     }, [currentPage]);
 
     return (
         <div>
+            {/* Notification */}
+            {deleteSuccessNotification && (
+                <div className="alert alert-success">
+                    Employee deleted successfully!
+                </div>
+            )}
+
             <div>
                 <div className="input-group">
                     <input type="text" className="form-control" placeholder="Search For Employee" />
