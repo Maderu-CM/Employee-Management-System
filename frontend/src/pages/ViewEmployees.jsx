@@ -23,7 +23,7 @@ const ViewEmployees = () => {
                 }
             })
             .catch((error) => {
-                console.error('Error:', error);
+                console.error('Error fetching employees:', error);
                 setEmployees([]);
                 setError('Error fetching employees');
                 setHasMorePages(false);
@@ -35,6 +35,43 @@ const ViewEmployees = () => {
         fetchEmployees(newPage);
     };
 
+    const handleDeleteEmployee = (employeeId) => {
+        console.log('Employee ID:', employeeId);
+    
+        if (window.confirm('Are you sure you want to delete this employee?')) {
+            if (!employeeId) {
+                console.error('Employee ID is undefined');
+                return;
+            }
+    
+            fetch(`http://127.0.0.1:5000/delete_employee/${employeeId}`, {
+                method: 'DELETE',
+            })
+                .then((response) => {
+                    console.log('Delete response status:', response.status); // Add this line for additional info
+    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log('Delete response data:', data); // Add this line for additional info
+    
+                    if (data.status === 'success') {
+                        // Reload the employee list after successful deletion
+                        fetchEmployees(currentPage);
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Fetch error:', error);
+                    alert('Error during the fetch request');
+                });
+        }
+    };
+    
     useEffect(() => {
         fetchEmployees(currentPage);
     }, [currentPage]);
@@ -61,6 +98,7 @@ const ViewEmployees = () => {
                         <th>Lastname</th>
                         <th>Midint</th>
                         <th>Contact</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +108,15 @@ const ViewEmployees = () => {
                             <td>{employee.lastname}</td>
                             <td>{employee.midint}</td>
                             <td>{employee.contact}</td>
+                            <td>
+                                <button className="btn btn-primary ml-2">EDIT</button>
+                                <button
+                                    className="btn btn-danger ml-2"
+                                    onClick={() => handleDeleteEmployee(employee.id)}
+                                >
+                                    DELETE
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

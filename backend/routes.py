@@ -107,6 +107,7 @@ def view_employees():
         employee_list = []
         for employee in employees:
             employee_data = {
+                'id' : employee.id,
                 'firstname': employee.firstname,
                 'midint': employee.midint,
                 'lastname': employee.lastname,
