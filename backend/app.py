@@ -49,7 +49,7 @@ class Department(db.Model):
     departmentHead = db.Column(db.String, nullable=False)
     Location = db.Column(db.String, nullable=False)
 
-    # Corrected backref name
+    # relationship
     employees = db.relationship('Employee', backref='department_relation', lazy=True, cascade='all, delete-orphan')
 
 import routes

@@ -95,6 +95,7 @@ const ViewDepartment = () => {
                             <td>{department.departmentHead}</td>
                             <td>{department.Location}</td>
                             <td>
+                            <button className="btn btn-primary ml-2">VIEW</button>
                                 <button className="btn btn-primary ml-2">EDIT</button>
                                 <button
                                     className="btn btn-danger ml-2"
@@ -102,6 +103,7 @@ const ViewDepartment = () => {
                                 >
                                     DELETE
                                 </button>
+
                             </td>
                         </tr>
                     ))}
