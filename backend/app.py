@@ -61,7 +61,8 @@ class Assignment (db.Model):
     # relationship
     employees = db.relationship(
         'Employee', backref='assignment_relation', lazy=True, cascade='all, delete-orphan')
-
+    
+import routes
 
 if __name__ == '__main__':
     app.run(debug=True)

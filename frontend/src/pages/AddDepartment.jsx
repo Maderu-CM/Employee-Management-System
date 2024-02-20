@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function AddDepartment() {
+function AddAssignment() {
   const [formData, setFormData] = useState({
     departmentName: '',
     departmentHead: '',
@@ -20,7 +20,7 @@ function AddDepartment() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    fetch('http://127.0.0.1:5000/add_department', {
+    fetch('http://127.0.0.1:5000/add_assignment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ function AddDepartment() {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Error adding department: ${response.statusText}`);
+          throw new Error(`Error adding assignment: ${response.statusText}`);
         }
         return response.json();
       })
@@ -44,7 +44,7 @@ function AddDepartment() {
       })
       .catch((error) => {
         console.error('Error:', error);
-        setErrorMessage(error.message || 'Error adding department');
+        setErrorMessage(error.message || 'Error adding assignment');
         setSuccessMessage('');
       });
   };
@@ -52,7 +52,7 @@ function AddDepartment() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ marginTop: '20px', color: 'blue' }}>
-        <h2>Add Department</h2>
+        <h2>Add Assignment</h2>
       </div>
 
       <div style={{ width: '60%', alignSelf: 'center', marginTop: '20px', maxWidth: '400px' }}>
@@ -100,7 +100,7 @@ function AddDepartment() {
 
           <div className="form-group" style={{ marginTop: '10px' }}>
             <button type="submit" className="btn btn-primary" style={{ transition: 'background-color 0.3s' }}>
-              Add Department
+              Add Assignment
             </button>
           </div>
         </form>
@@ -109,4 +109,4 @@ function AddDepartment() {
   );
 }
 
-export default AddDepartment;
+export default AddAssignment;

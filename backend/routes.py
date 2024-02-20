@@ -1,6 +1,6 @@
 from flask import jsonify
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-from app import db, Employee, Assignment, app
+from flask import  render_template, request
+from app import app,db, Employee, Assignment
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
@@ -91,28 +91,37 @@ def save_file(file):
         return filename
     return None
 
-# Add a department
+# Add a assignment
 @app.route('/add_assignment', methods=['POST'])
-def add_department():
+def add_assignment():
     try:
         data = request.get_json()
 
-        departmentName = data.get('departmentName')
-        departmentHead = data.get('departmentHead')
-        Location = data.get('Location')
+        # Check if all required fields are present
+        required_fields = ['departmentName', 'departmentHead', 'Location']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
+        # Validate data types
+        if not all(isinstance(data[field], str) for field in ['departmentName', 'departmentHead', 'Location']):
+            return jsonify({'error': 'Invalid data types. Expected strings for all fields.'}), 400
+
+        # Create a new assignment instance
         new_assignment = Assignment(
-            departmentName=departmentName,
-            departmentHead=departmentHead,
-            Location=Location
+            departmentName=data['departmentName'],
+            departmentHead=data['departmentHead'],
+            Location=data['Location']
         )
 
+        # Add the new assignment to the database session and commit changes
         db.session.add(new_assignment)
         db.session.commit()
 
         return jsonify({'message': 'New Department registered successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 # view employees
 @app.route('/employees', methods=['GET'])
@@ -204,7 +213,7 @@ def edit_employee(employee_id):
                         if department_name:
                             assignment =Assignment.query.filter_by(departmentName=department_name).first()
                             if assignment:
-                                employee.assignment= assignmentt
+                                employee.assignment= assignment
 
                         employee.educationlevel = json_data.get('educationlevel')
                         employee.job = json_data.get('job')
@@ -275,40 +284,41 @@ def search_employees():
 @app.route('/assignments', methods=['GET'])
 def get_assignments():
     try:
-        assignments= Assignment.query.all()
+        assignments = Assignment.query.all()
 
-        department_list = []
+        assignment_list = []
         for assignment in assignments:
             assignment_data = {
                 'departmentnumber': assignment.departmentnumber,
-                'departmentName':assignment.departmentName,
+                'departmentName': assignment.departmentName,
                 'departmentHead': assignment.departmentHead,
                 'Location': assignment.Location
             }
-            department_list.append(assignment_data)
+            assignment_list.append(assignment_data)
 
-        return jsonify({'status': 'success', 'departments': department_list}), 200
+        return jsonify({'status': 'success', 'assignments': assignment_list}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# deleting a department
-@app.route('/delete_department/<int:departmentnumber>', methods=['DELETE'])
-def delete_department(departmentnumber):
-    try:
-        department = Department.query.get(departmentnumber)
 
-        if department:
+# deleting a department
+@app.route('/delete_assignment/<int:departmentnumber>', methods=['DELETE'])
+def delete_assignment(departmentnumber):
+    try:
+        assignment =assignment.query.get(departmentnumber)
+
+        if assignment:
             # Delete the associated employees
-            for employee in department.employees:
+            for employee in assignment.employees:
                 db.session.delete(employee)
 
-            # Delete the department
-            db.session.delete(department)
+            # Delete the assignment
+            db.session.delete(assignment)
             db.session.commit()
 
-            return jsonify({'status': 'success', 'message': 'Department and associated employees deleted successfully'}), 200
+            return jsonify({'status': 'success', 'message': 'Assignment and associated employees deleted successfully'}), 200
         else:
-            return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+            return jsonify({'status': 'error', 'message': 'Assignment not found'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -316,21 +326,21 @@ def delete_department(departmentnumber):
 @app.route('/edit_department/<int:departmentNumber>', methods=['GET', 'POST'])
 def edit_department(departmentNumber):
     try:
-        department = Department.query.get(departmentNumber)
+        assignment = assignment.query.get(departmentNumber)
 
         if request.method == 'GET':
-            if department:
-                return render_template('department.html', department=department)
+            if assignment:
+                return render_template('department.html', department=assignment)
             else:
                 return jsonify({'status': 'error', 'message': 'Department not found'}), 404
 
         elif request.method == 'POST':
-            if department:
+            if assignment:
                 try:
                     # Access form data using request.form
-                    department.departmentName = request.form.get('departmentname')
-                    department.departmentHead = request.form.get('departmenthead')
-                    department.Location = request.form.get('location')
+                    assignment.departmentName = request.form.get('departmentname')
+                    assignment.departmentHead = request.form.get('departmenthead')
+                    assignment.Location = request.form.get('location')
 
                     db.session.commit()
 

@@ -1,39 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
 
-const ViewDepartment = () => {
-    const [departments, setDepartments] = useState([]);
+const ViewAssignment = () => {
+    const [assignments, setAssignments] = useState([]);
     const [error, setError] = useState('');
     const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
 
-    const fetchAllDepartments = () => {
-        fetch('http://127.0.0.1:5000/departments')
+    const fetchAllAssignments = () => {
+        fetch('http://127.0.0.1:5000/assignments')
             .then((response) => response.json())
             .then((data) => {
                 if (data.status === 'success') {
-                    setDepartments(data.departments);
+                    setAssignments(data.assignments);
                     setError('');
                 } else {
-                    setDepartments([]);
-                    setError('Error fetching departments');
+                    setAssignments([]);
+                    setError('Error fetching assignments');
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
-                setDepartments([]);
-                setError('Error fetching department');
+                setAssignments([]);
+                setError('Error fetching assignment');
             });
     };
 
-    const handleDeleteDepartment = async (departmentnumber) => {
-        if (window.confirm('Are you sure you want to delete this department and its employees?')) {
+    const handleDeleteAssignment = async (departmentnumber) => {
+        if (window.confirm('Are you sure you want to delete this Assignment and its employees?')) {
             if (!departmentnumber) {
                 console.error('departmentnumber is undefined');
                 return;
             }
 
             try {
-                const response = await fetch(`http://127.0.0.1:5000/delete_department/${departmentnumber}`, {
+                const response = await fetch(`http://127.0.0.1:5000/delete_assignment/${departmentnumber}`, {
                     method: 'DELETE',
                 });
 
@@ -52,7 +52,7 @@ const ViewDepartment = () => {
                     await new Promise((resolve) => setTimeout(resolve, 500));
 
                     // Reload the department list after successful deletion
-                    fetchAllDepartments();
+                    fetchAllAssignments();
                 } else {
                     alert(`Error: ${data.message}`);
                 }
@@ -64,7 +64,7 @@ const ViewDepartment = () => {
     };
 
     useEffect(() => {
-        fetchAllDepartments();
+        fetchAllAssignments();
     }, []);
 
     return (
@@ -72,7 +72,7 @@ const ViewDepartment = () => {
             {/* Success Notification */}
             {deleteSuccessNotification && (
                 <div className="alert alert-success">
-                    Department deleted successfully!
+                    Assignment deleted successfully!
                 </div>
             )}
 
@@ -89,17 +89,17 @@ const ViewDepartment = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {departments.map((department, index) => (
+                    {assignments.map((assignment, index) => (
                         <tr key={index}>
-                            <td>{department.departmentName}</td>
-                            <td>{department.departmentHead}</td>
-                            <td>{department.Location}</td>
+                            <td>{assignment.departmentName}</td>
+                            <td>{assignment.departmentHead}</td>
+                            <td>{assignment.Location}</td>
                             <td>
                             <button className="btn btn-primary ml-2">VIEW</button>
                                 <button className="btn btn-primary ml-2">EDIT</button>
                                 <button
                                     className="btn btn-danger ml-2"
-                                    onClick={() => handleDeleteDepartment(department.departmentnumber)}
+                                    onClick={() => handleDeleteAssignment(assignment.departmentnumber)}
                                 >
                                     DELETE
                                 </button>
@@ -113,4 +113,4 @@ const ViewDepartment = () => {
     );
 };
 
-export default ViewDepartment;
+export default ViewAssignment;
