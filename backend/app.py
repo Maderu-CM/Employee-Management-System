@@ -1,4 +1,4 @@
-import routes
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -28,14 +28,13 @@ class Employee(db.Model):
     __tablename__ = 'employee'
 
     id = db.Column(db.Integer, nullable=False, unique=True,
-                   autoincrement=True, primary_key=True)
+autoincrement=True, primary_key=True)
     firstname = db.Column(db.String(30), nullable=False)
     lastname = db.Column(db.String(30), unique=False, nullable=False)
     dateOfBirth = db.Column(db.DateTime, nullable=False)
     gender = db.Column(db.String(30), nullable=False)
     contact = db.Column(db.String(20), unique=True, nullable=False)
     IdentificationNumber = db.Column(db.Integer, unique=True, nullable=False)
-
     departmentnumber = db.Column(db.Integer, db.ForeignKey('assignment.departmentnumber'), nullable=False)
     dateOfEmployment = db.Column(db.DateTime, nullable=False)
     contractPeriod = db.Column(db.Integer, nullable=False)
