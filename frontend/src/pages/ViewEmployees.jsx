@@ -36,40 +36,41 @@ const ViewEmployees = () => {
         fetchEmployees(newPage);
     };
 
-    const handleDeleteEmployee = (employeeId) => {
+    const handleDeleteEmployee = async (employee_id) => { 
         if (window.confirm('Are you sure you want to delete this employee?')) {
-            if (!employeeId) {
+            if (!employee_id) {
                 console.error('Employee ID is undefined');
                 return;
             }
 
-            fetch(`http://127.0.0.1:5000/delete_employee/${employeeId}`, {
-                method: 'DELETE',
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data.status === 'success') {
-                        setDeleteSuccessNotification(true);
-                        setTimeout(() => setDeleteSuccessNotification(false), 2000);
-                       
-                        fetchEmployees(currentPage);
-                    } else {
-                        alert(`Error: ${data.message}`);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Fetch error:', error);
-                    alert('Error during the fetch request');
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/delete_employee/${employee_id}`, {
+                    method: 'DELETE',
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+            
+                if (data.status === 'success') {
+                    // Set the notification to true for a short duration
+                    setDeleteSuccessNotification(true);
+                    setTimeout(() => setDeleteSuccessNotification(false), 2000);
+
+                    // Wait for a short duration to allow the server to update the data
+                    await new Promise((resolve) => setTimeout(resolve, 500));
+
+                    // Reload the employee list after successful deletion
+                    fetchEmployees(currentPage);
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Error during the fetch request');
+            }
         }
     };
-
-    
 
     useEffect(() => {
         fetchEmployees(currentPage);
@@ -82,8 +83,6 @@ const ViewEmployees = () => {
                     Employee deleted successfully!
                 </div>
             )}
-
-            
 
             <div>
                 <div className="input-group">
@@ -105,8 +104,6 @@ const ViewEmployees = () => {
                         <th>Lastname</th>
                         <th>Midint</th>
                         <th>Contact</th>
-                        
-                       
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -117,14 +114,8 @@ const ViewEmployees = () => {
                             <td>{employee.lastname}</td>
                             <td>{employee.midint}</td>
                             <td>{employee.contact}</td>
-                            
                             <td>
-                                <button
-                                    className="btn btn-success ml-2"
-                                    
-                                >
-                                    VIEW
-                                </button>
+                                <button className="btn btn-success ml-2">VIEW</button>
                                 <button className="btn btn-primary ml-2">EDIT</button>
                                 <button
                                     className="btn btn-danger ml-2"

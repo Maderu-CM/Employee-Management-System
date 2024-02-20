@@ -137,18 +137,18 @@ def view_employees():
         employee_list = []
         for employee in employees:
             employee_data = {
-                'id': employee.id,
+               
                 'firstname': employee.firstname,
-                'midint': employee.midint,
                 'lastname': employee.lastname,
-                'contact': employee.contact
+                'contact': employee.contact,
+                'IdentificationNumber':employee. IdentificationNumber,
             }
             employee_list.append(employee_data)
 
-        return jsonify({'status': 'success', 'employees': employee_list})
+        return jsonify({'status': 'success', 'employees': employee_list}),200
 
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        return jsonify({'status': 'error', 'message': str(e)}),400
 
 # view details of a specific user.
 @app.route('/employees/<int:employee_id>', methods=['GET'])
@@ -305,7 +305,7 @@ def get_assignments():
 @app.route('/delete_assignment/<int:departmentnumber>', methods=['DELETE'])
 def delete_assignment(departmentnumber):
     try:
-        assignment =assignment.query.get(departmentnumber)
+        assignment =Assignment.query.get(departmentnumber)
 
         if assignment:
             # Delete the associated employees
