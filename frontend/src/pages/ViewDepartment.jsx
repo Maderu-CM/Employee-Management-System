@@ -5,6 +5,13 @@ const ViewAssignment = () => {
     const [assignments, setAssignments] = useState([]);
     const [error, setError] = useState('');
     const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
+    const [updateSuccessNotification, setUpdateSuccessNotification] = useState(false); // New state for update success notification
+    const [editingAssignment, setEditingAssignment] = useState(null);
+    const [editedAssignment, setEditedAssignment] = useState({
+        departmentName: '',
+        departmentHead: '',
+        Location: ''
+    });
 
     const fetchAllAssignments = () => {
         fetch('http://127.0.0.1:5000/assignments')
@@ -63,16 +70,72 @@ const ViewAssignment = () => {
         }
     };
 
+    const handleEditAssignment = (assignment) => {
+        setEditingAssignment(assignment);
+        setEditedAssignment({
+            departmentName: assignment.departmentName,
+            departmentHead: assignment.departmentHead,
+            Location: assignment.Location
+        });
+    };
+
+    const handleUpdateAssignment = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/edit_department/${editingAssignment.departmentnumber}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(editedAssignment),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                // Set the update success notification
+                setUpdateSuccessNotification(true);
+                setTimeout(() => setUpdateSuccessNotification(false), 2000);
+
+                // Reset editing state
+                setEditingAssignment(null);
+                setEditedAssignment({
+                    departmentName: '',
+                    departmentHead: '',
+                    Location: ''
+                });
+
+                // Reload the department list after successful update
+                fetchAllAssignments();
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('Error during the fetch request');
+        }
+    };
+
     useEffect(() => {
         fetchAllAssignments();
     }, []);
 
     return (
         <div>
-            {/* Success Notification */}
+            {/* Success Notification for deletion */}
             {deleteSuccessNotification && (
                 <div className="alert alert-success">
                     Assignment deleted successfully!
+                </div>
+            )}
+
+            {/* Success Notification for update */}
+            {updateSuccessNotification && (
+                <div className="alert alert-success">
+                    Assignment updated successfully!
                 </div>
             )}
 
@@ -91,19 +154,48 @@ const ViewAssignment = () => {
                 <tbody>
                     {assignments.map((assignment, index) => (
                         <tr key={index}>
-                            <td>{assignment.departmentName}</td>
-                            <td>{assignment.departmentHead}</td>
-                            <td>{assignment.Location}</td>
+                            <td>{editingAssignment === assignment ? (
+                                <input
+                                    type="text"
+                                    value={editedAssignment.departmentName}
+                                    onChange={(e) => setEditedAssignment({ ...editedAssignment, departmentName: e.target.value })}
+                                />
+                            ) : (
+                                assignment.departmentName
+                            )}</td>
+                            <td>{editingAssignment === assignment ? (
+                                <input
+                                    type="text"
+                                    value={editedAssignment.departmentHead}
+                                    onChange={(e) => setEditedAssignment({ ...editedAssignment, departmentHead: e.target.value })}
+                                />
+                            ) : (
+                                assignment.departmentHead
+                            )}</td>
+                            <td>{editingAssignment === assignment ? (
+                                <input
+                                    type="text"
+                                    value={editedAssignment.Location}
+                                    onChange={(e) => setEditedAssignment({ ...editedAssignment, Location: e.target.value })}
+                                />
+                            ) : (
+                                assignment.Location
+                            )}</td>
                             <td>
-                            <button className="btn btn-primary ml-2">VIEW</button>
-                                <button className="btn btn-primary ml-2">EDIT</button>
+                                {editingAssignment === assignment ? (
+                                    <React.Fragment>
+                                        <button className="btn btn-primary ml-2" onClick={() => handleUpdateAssignment()}>Save</button>
+                                        <button className="btn btn-secondary ml-2" onClick={() => setEditingAssignment(null)}>Cancel</button>
+                                    </React.Fragment>
+                                ) : (
+                                    <button className="btn btn-primary ml-2" onClick={() => handleEditAssignment(assignment)}>Edit</button>
+                                )}
                                 <button
                                     className="btn btn-danger ml-2"
                                     onClick={() => handleDeleteAssignment(assignment.departmentnumber)}
                                 >
                                     DELETE
                                 </button>
-
                             </td>
                         </tr>
                     ))}

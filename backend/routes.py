@@ -300,6 +300,27 @@ def get_assignments():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+#employee selection
+@app.route('/employee_selection', methods=['GET'])
+def get_employees():
+    try:
+        employees = Employee.query.all()
+
+        employee_list = []
+        for employee in employees:
+            employee_data = {
+                'firstname': employee.firstname,
+                'lastname': employee.lastname
+                
+              
+            }
+        employee_list.append(employee_data)
+
+        return jsonify({'status': 'success', 'employees': employee_list}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+ 
+
 
 # deleting a department
 @app.route('/delete_assignment/<int:departmentnumber>', methods=['DELETE'])
@@ -323,35 +344,50 @@ def delete_assignment(departmentnumber):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 # Retrieve and update department's details
+
+
 @app.route('/edit_department/<int:departmentNumber>', methods=['GET', 'POST'])
 def edit_department(departmentNumber):
     try:
-        assignment = assignment.query.get(departmentNumber)
+        # Attempt to retrieve the Assignment object
+        assignment = Assignment.query.get(departmentNumber)
+
+        if not assignment:
+            return jsonify({'status': 'error', 'message': 'Assignment not found'}), 404
 
         if request.method == 'GET':
-            if assignment:
-                return render_template('department.html', department=assignment)
-            else:
-                return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+            return render_template('department.html', assignment=assignment)
 
         elif request.method == 'POST':
-            if assignment:
-                try:
-                    # Access form data using request.form
-                    assignment.departmentName = request.form.get('departmentname')
-                    assignment.departmentHead = request.form.get('departmenthead')
-                    assignment.Location = request.form.get('location')
+            # Access form data using request.json instead of request.form
+            data = request.json
+            
+            # Check if required fields are present and not empty
+            if 'departmentName' not in data or not data['departmentName'].strip():
+                return jsonify({'status': 'error', 'message': 'Department name is required'}), 400
+            
+            if 'departmentHead' not in data or not data['departmentHead'].strip():
+                return jsonify({'status': 'error', 'message': 'Department head is required'}), 400
+            
+            if 'Location' not in data or not data['Location'].strip():
+                return jsonify({'status': 'error', 'message': 'Location is required'}), 400
 
-                    db.session.commit()
+            # Update assignment fields
+            assignment.departmentName = data['departmentName']
+            assignment.departmentHead = data['departmentHead']
+            assignment.Location = data['Location']
 
-                    return jsonify({'status': 'success', 'message': 'Department updated successfully'}), 200
-                except Exception as e:
-                    return jsonify({'status': 'error', 'message': str(e)}), 500
-            else:
-                return jsonify({'status': 'error', 'message': 'Department not found'}), 404
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': 'Department updated successfully'}), 200
 
     except Exception as e:
+        # Handle any exceptions that may occur during the assignment retrieval process
+        db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
