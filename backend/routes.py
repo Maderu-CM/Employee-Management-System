@@ -150,6 +150,30 @@ def view_employees():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}),400
 
+#selection of department head
+@app.route('/select_hod', methods=['GET'])
+def select_hod():
+    try:
+        
+
+        employees = Employee.query.all()
+
+        employee_list = []
+        for employee in employees:
+            employee_data = {
+               
+                'firstname': employee.firstname,
+                'lastname': employee.lastname,
+               
+            }
+            employee_list.append(employee_data)
+
+        return jsonify({'status': 'success', 'employees': employee_list}),200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}),400
+
+
 # view details of a specific user.
 @app.route('/employees/<int:employee_id>', methods=['GET'])
 def view_employee(employee_id):

@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function AddAssignment() {
   const [formData, setFormData] = useState({
     departmentName: '',
-    departmentHead: '',
+    departmentHead: '', // Changed to hold employee ID instead of name
     Location: '', 
   });
+  const [employees, setEmployees] = useState([]); // State variable to hold the list of employees
+
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch list of employees when component mounts
+    fetch('http://127.0.0.1:5000/select_hod')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setEmployees(data.employees);
+        } else {
+          setEmployees([]);
+          setErrorMessage('Error fetching employees');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setEmployees([]);
+        setErrorMessage('Error fetching employees');
+      });
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,14 +97,18 @@ function AddAssignment() {
 
           <div className="form-group">
             <label htmlFor="departmentHead">Department Head</label>
-            <input
-              type="text"
+            <select
               className="form-control"
               id="departmentHead"
               name="departmentHead"
               value={formData.departmentHead}
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Select Head of Department</option>
+              {employees.map(employee => (
+                <option key={employee.id} value={employee.id}>{employee.firstname} {employee.lastname}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
