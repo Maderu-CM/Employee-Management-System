@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask import  render_template, request
-from app import app,db, Employee, Assignment
+from app import app,db, Employee, Assignment, Document
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
@@ -12,84 +12,56 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = 'kjsfhiuyrnAUTdjhddjlkjfeadDAlHgDM'
 
 # Adding an employee
-@app.route('/add_employee', methods=['POST'])
-def add_employee():
+@app.route('/employees', methods=['POST'])
+def create_employee():
     try:
-        data = request.form
+        data = request.json
 
-        # Check if all required fields are present
-        required_fields = ['firstname', 'lastname', 'date_of_birth', 'gender', 'contact',
-                           'identification_number', 'department_name', 'date_of_employment',
-                           'contract_period', 'job', 'passport', 'id_copy', 'chief_letter',
-                           'clearance_letter', 'reference']
+        # Validate request data
+        required_fields = ['firstname', 'lastname', 'dateOfBirth', 'gender', 'contact',
+                           'IdentificationNumber', 'departmentname', 'dateOfEmployment',
+                           'contractPeriod', 'job']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             return jsonify({'error': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
-        firstname = data['firstname']
-        lastname = data['lastname']
-        date_of_birth = data['date_of_birth']
-        gender = data['gender']
-        contact = data['contact']
-        identification_number = data['identification_number']
-        department_name = data['department_name']
-        date_of_employment = data['date_of_employment']
-        contract_period = data['contract_period']
-        job = data['job']
-        passport_file = request.files['passport']
-        id_copy_file = request.files['id_copy']
-        chief_letter_file = request.files['chief_letter']
-        clearance_letter_file = request.files['clearance_letter']
-        reference_file = request.files['reference']
-
         # Convert date strings to datetime objects
-        date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d')
-        date_of_employment = datetime.strptime(date_of_employment, '%Y-%m-%d')
+        date_of_birth = datetime.strptime(data['dateOfBirth'], '%Y-%m-%d')
+        date_of_employment = datetime.strptime(data['dateOfEmployment'], '%Y-%m-%d')
 
-        # Retrieve department
-        department = Assignment.query.filter_by(departmentName=department_name).first()
+        # Query department based on department name
+        department = Assignment.query.filter_by(departmentName=data['departmentname']).first()
         if not department:
             return jsonify({'error': 'Department not found'}), 404
 
-        # Save files and get file paths
-        passport_filepath = save_file(passport_file)
-        id_copy_filepath = save_file(id_copy_file)
-        chief_letter_filepath = save_file(chief_letter_file)
-        clearance_letter_filepath = save_file(clearance_letter_file)
-        reference_filepath = save_file(reference_file)
-
-        # Create employee instance
+        # Create new employee instance
         new_employee = Employee(
-            firstname=firstname,
-            lastname=lastname,
+            firstname=data['firstname'],
+            lastname=data['lastname'],
             dateOfBirth=date_of_birth,
-            gender=gender,
-            contact=contact,
-            IdentificationNumber=identification_number,
-            departmentnumber=department.departmentnumber,
+            gender=data['gender'],
+            contact=data['contact'],
+            IdentificationNumber=data['IdentificationNumber'],
+            departmentnumber=department.departmentnumber,  # Use department number obtained from the query
             dateOfEmployment=date_of_employment,
-            contractPeriod=contract_period,
-            job=job,
-            passport_filepath=passport_filepath,
-            IdCopy_filepath=id_copy_filepath,
-            ChiefLetter_filepath=chief_letter_filepath,
-            ClearanceLetter_filepath=clearance_letter_filepath,
-            Reference_filepath=reference_filepath
+            contractPeriod=data['contractPeriod'],
+            job=data['job']
         )
 
+        # Add employee to the database session and commit changes
         db.session.add(new_employee)
         db.session.commit()
 
-        return jsonify({'message': 'New Employee added successfully'}), 201
+        return jsonify({'message': 'Employee created successfully'}), 201
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+#document upload
 
-def save_file(file):
-    if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return filename
-    return None
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Add a assignment
 @app.route('/add_assignment', methods=['POST'])
@@ -323,7 +295,29 @@ def get_assignments():
         return jsonify({'status': 'success', 'assignments': assignment_list}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
 
+#select departments
+@app.route('/select_department', methods=['GET'])
+def select_department():
+    try:
+        assignments = Assignment.query.all()
+
+        assignment_list = []
+        for assignment in assignments:
+            assignment_data = {
+                
+                'departmentName': assignment.departmentName
+               
+               
+            }
+            assignment_list.append(assignment_data)
+
+        return jsonify({'status': 'success', 'assignments': assignment_list}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+    
 #employee selection
 @app.route('/employee_selection', methods=['GET'])
 def get_employees():

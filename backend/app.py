@@ -1,4 +1,5 @@
 
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -28,22 +29,18 @@ class Employee(db.Model):
     __tablename__ = 'employee'
 
     id = db.Column(db.Integer, nullable=False, unique=True,
-autoincrement=True, primary_key=True)
+                   autoincrement=True, primary_key=True)
     firstname = db.Column(db.String(30), nullable=False)
     lastname = db.Column(db.String(30), unique=False, nullable=False)
     dateOfBirth = db.Column(db.DateTime, nullable=False)
     gender = db.Column(db.String(30), nullable=False)
     contact = db.Column(db.String(20), unique=True, nullable=False)
     IdentificationNumber = db.Column(db.Integer, unique=True, nullable=False)
-    departmentnumber = db.Column(db.Integer, db.ForeignKey('assignment.departmentnumber'), nullable=False)
+    departmentnumber = db.Column(db.Integer, db.ForeignKey(
+        'assignment.departmentnumber'), nullable=False)
     dateOfEmployment = db.Column(db.DateTime, nullable=False)
     contractPeriod = db.Column(db.Integer, nullable=False)
     job = db.Column(db.String, nullable=False)
-    passport_filepath = db.Column(db.String, nullable=False)
-    IdCopy_filepath = db.Column(db.String, nullable=False)
-    ChiefLetter_filepath = db.Column(db.String, nullable=False)
-    ClearanceLetter_filepath = db.Column(db.String, nullable=False)
-    Reference_filepath = db.Column(db.String)
 
     # Define the relationship without cascade on the many side
     assignment = db.relationship(
@@ -61,7 +58,24 @@ class Assignment (db.Model):
     # relationship
     employees = db.relationship(
         'Employee', backref='assignment_relation', lazy=True, cascade='all, delete-orphan')
-    
+
+
+class Document(db.Model):
+    __tablename__ = 'document'
+
+    id = db.Column(db.Integer, nullable=False, unique=True,
+                   autoincrement=True, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey(
+        'employee.id'), nullable=False)
+    passport_filepath = db.Column(db.String, nullable=False)
+    IdCopy_filepath = db.Column(db.String, nullable=False)
+    ChiefLetter_filepath = db.Column(db.String, nullable=False)
+    ClearanceLetter_filepath = db.Column(db.String, nullable=False)
+    Reference_filepath = db.Column(db.String)
+
+    # Define back reference to Employee
+    employee = db.relationship('Employee', backref='document')
+
 import routes
 
 if __name__ == '__main__':

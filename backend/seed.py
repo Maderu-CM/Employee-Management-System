@@ -1,5 +1,4 @@
-from app import db, Employee, Assignment, app
-
+from app import db, Employee, Assignment, Document,app
 
 from faker import Faker
 
@@ -62,13 +61,20 @@ def create_fake_employee(count=15):
                 dateOfEmployment=date_of_employment,
                 contractPeriod=contract_period,
                 job=fake.job(),
+            )
+            db.session.add(employee)
+            db.session.commit()
+
+            # Create Document instance and link to Employee
+            document = Document(
+                employee_id=employee.id,
                 passport_filepath=passport_filepath,
                 IdCopy_filepath=id_copy_filepath,
                 ChiefLetter_filepath=chief_letter_filepath,
                 ClearanceLetter_filepath=clearance_letter_filepath,
                 Reference_filepath=reference_filepath
             )
-            db.session.add(employee)
+            db.session.add(document)
             db.session.commit()
 
             # Upload documents

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function AddEmployee() {
     const [formData, setFormData] = useState({
@@ -8,39 +8,48 @@ function AddEmployee() {
         gender: '',
         contact: '',
         identification_number: '',
-        department_name: '',
+        department_name: '', 
         date_of_employment: '',
         contract_period: '',
-        job: '',
-        passport: null,
-        id_copy: null,
-        chief_letter: null,
-        clearance_letter: null,
-        reference: null
+        job: ''
     });
+    const [assignments, setAssignments] = useState([]); // State to store the fetched assignments
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        // Fetch list of assignments
+        fetch('http://127.0.0.1:5000/select_department')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setAssignments(data.assignments);
+                } else {
+                    setAssignments([]);
+                    setErrorMessage('Error fetching assignments');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setAssignments([]);
+                setErrorMessage('Error fetching assignments');
+            });
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        setFormData({ ...formData, [name]: files[0] });
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const formDataToSend = new FormData();
-            for (const key in formData) {
-                formDataToSend.append(key, formData[key]);
-            }
-            const response = await fetch('http://127.0.0.1:5000/add_employee', {
+            const response = await fetch('http://127.0.0.1:5000/employees', {
                 method: 'POST',
-                body: formDataToSend
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
             });
             if (!response.ok) {
                 throw new Error('Error adding employee');
@@ -58,12 +67,7 @@ function AddEmployee() {
                 department_name: '',
                 date_of_employment: '',
                 contract_period: '',
-                job: '',
-                passport: null,
-                id_copy: null,
-                chief_letter: null,
-                clearance_letter: null,
-                reference: null
+                job: ''
             });
         } catch (error) {
             console.error('Error:', error);
@@ -108,7 +112,12 @@ function AddEmployee() {
                 </label><br />
                 <label>
                     Department Name:
-                    <input type="text" name="department_name" value={formData.department_name} onChange={handleInputChange} required />
+                    <select name="department_name" value={formData.department_name} onChange={handleInputChange} required>
+                        <option value="">Select Department</option>
+                        {assignments.map(assignment => (
+                            <option key={assignment.departmentName} value={assignment.departmentName}>{assignment.departmentName}</option>
+                        ))}
+                    </select>
                 </label><br />
                 <label>
                     Date of Employment:
@@ -122,26 +131,7 @@ function AddEmployee() {
                     Job:
                     <input type="text" name="job" value={formData.job} onChange={handleInputChange} required />
                 </label><br />
-                <label>
-                    Passport:
-                    <input type="file" name="passport" onChange={handleFileChange} required />
-                </label><br />
-                <label>
-                    ID Copy:
-                    <input type="file" name="id_copy" onChange={handleFileChange} required />
-                </label><br />
-                <label>
-                    Chief Letter:
-                    <input type="file" name="chief_letter" onChange={handleFileChange} required />
-                </label><br />
-                <label>
-                    Clearance Letter:
-                    <input type="file" name="clearance_letter" onChange={handleFileChange} required />
-                </label><br />
-                <label>
-                    Reference:
-                    <input type="file" name="reference" onChange={handleFileChange} required />
-                </label><br />
+                
                 <button type="submit">Add Employee</button>
             </form>
         </div>
