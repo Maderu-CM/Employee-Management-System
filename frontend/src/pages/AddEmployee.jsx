@@ -1,138 +1,135 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function AddEmployee() {
     const [formData, setFormData] = useState({
         firstname: '',
         lastname: '',
-        date_of_birth: '',
+        dateOfBirth: '',
         gender: '',
         contact: '',
-        identification_number: '',
-        department_name: '', 
-        date_of_employment: '',
-        contract_period: '',
-        job: ''
+        IdentificationNumber: '',
+        departmentname: '',
+        dateOfEmployment: '',
+        contractPeriod: '',
+        job: '',
+        passportFile: null,
+        idCopyFile: null,
+        chiefLetterFile: null,
+        clearanceLetterFile: null,
+        referenceFile: null
     });
-    const [assignments, setAssignments] = useState([]); // State to store the fetched assignments
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
-    useEffect(() => {
-        // Fetch list of assignments
-        fetch('http://127.0.0.1:5000/select_department')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    setAssignments(data.assignments);
-                } else {
-                    setAssignments([]);
-                    setErrorMessage('Error fetching assignments');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setAssignments([]);
-                setErrorMessage('Error fetching assignments');
-            });
-    }, []);
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+    const handleChange = (e) => {
+        if (e.target.name === 'passportFile' || e.target.name === 'idCopyFile' || e.target.name === 'chiefLetterFile' || e.target.name === 'clearanceLetterFile' || e.target.name === 'referenceFile') {
+            setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+        } else {
+            setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Convert date format to match backend (YYYY-MM-DD)
+        const dateOfBirth = new Date(formData.dateOfBirth).toISOString().split('T')[0];
+        const dateOfEmployment = new Date(formData.dateOfEmployment).toISOString().split('T')[0];
+
+        const employeeData = {
+            ...formData,
+            dateOfBirth: dateOfBirth,
+            dateOfEmployment: dateOfEmployment
+        };
+
         try {
-            const response = await fetch('http://127.0.0.1:5000/employees', {
+            // Add employee
+            const employeeResponse = await fetch('http://127.0.0.1:5000/addemployee', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(employeeData),
             });
-            if (!response.ok) {
+
+            if (!employeeResponse.ok) {
                 throw new Error('Error adding employee');
             }
-            const data = await response.json();
-            setSuccessMessage(data.message);
-            setErrorMessage('');
-            setFormData({
-                firstname: '',
-                lastname: '',
-                date_of_birth: '',
-                gender: '',
-                contact: '',
-                identification_number: '',
-                department_name: '',
-                date_of_employment: '',
-                contract_period: '',
-                job: ''
+
+            const employeeResult = await employeeResponse.json();
+            const employeeId = employeeResult.employee_id; // Corrected to access the employee_id
+
+            alert('Employee added successfully!');
+
+            // Upload documents
+            const documentFormData = new FormData();
+            documentFormData.append('passportFile', formData.passportFile);
+            documentFormData.append('idCopyFile', formData.idCopyFile);
+            documentFormData.append('chiefLetterFile', formData.chiefLetterFile);
+            documentFormData.append('clearanceLetterFile', formData.clearanceLetterFile);
+            documentFormData.append('referenceFile', formData.referenceFile);
+
+            const documentResponse = await fetch(`http://127.0.0.1:5000/upload_document/${employeeId}`, {
+                method: 'POST',
+                body: documentFormData,
             });
+
+            if (!documentResponse.ok) {
+                throw new Error('Error uploading documents');
+            }
+
+            alert('Documents uploaded successfully!');
         } catch (error) {
             console.error('Error:', error);
-            setErrorMessage(error.message || 'Error adding employee');
-            setSuccessMessage('');
+            alert('An error occurred while adding the employee or uploading documents.');
         }
     };
 
     return (
         <div>
-            <h2>Register Employee</h2>
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+            <h1>Add Employee</h1>
             <form onSubmit={handleSubmit}>
-                <label>
-                    First Name:
-                    <input type="text" name="firstname" value={formData.firstname} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Last Name:
-                    <input type="text" name="lastname" value={formData.lastname} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Date of Birth:
-                    <input type="date" name="date_of_birth" value={formData.date_of_birth} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Gender:
-                    <select name="gender" value={formData.gender} onChange={handleInputChange} required>
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </label><br />
-                <label>
-                    Contact:
-                    <input type="text" name="contact" value={formData.contact} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Identification Number:
-                    <input type="text" name="identification_number" value={formData.identification_number} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Department Name:
-                    <select name="department_name" value={formData.department_name} onChange={handleInputChange} required>
-                        <option value="">Select Department</option>
-                        {assignments.map(assignment => (
-                            <option key={assignment.departmentName} value={assignment.departmentName}>{assignment.departmentName}</option>
-                        ))}
-                    </select>
-                </label><br />
-                <label>
-                    Date of Employment:
-                    <input type="date" name="date_of_employment" value={formData.date_of_employment} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Contract Period:
-                    <input type="text" name="contract_period" value={formData.contract_period} onChange={handleInputChange} required />
-                </label><br />
-                <label>
-                    Job:
-                    <input type="text" name="job" value={formData.job} onChange={handleInputChange} required />
-                </label><br />
-                
-                <button type="submit">Add Employee</button>
+                <label htmlFor="firstname">First Name:</label><br />
+                <input type="text" id="firstname" name="firstname" value={formData.firstname} onChange={handleChange} required /><br />
+                <label htmlFor="lastname">Last Name:</label><br />
+                <input type="text" id="lastname" name="lastname" value={formData.lastname} onChange={handleChange} required /><br />
+                <label htmlFor="dateOfBirth">Date of Birth (YYYY-MM-DD):</label><br />
+                <input type="text" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required /><br />
+                <label htmlFor="gender">Gender:</label><br />
+                <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select><br />
+                <label htmlFor="contact">Contact:</label><br />
+                <input type="text" id="contact" name="contact" value={formData.contact} onChange={handleChange} required /><br />
+                <label htmlFor="IdentificationNumber">Identification Number:</label><br />
+                <input type="text" id="IdentificationNumber" name="IdentificationNumber" value={formData.IdentificationNumber} onChange={handleChange} required /><br />
+                <label htmlFor="departmentname">Department Name:</label><br />
+                <input type="text" id="departmentname" name="departmentname" value={formData.departmentname} onChange={handleChange} required /><br />
+                <label htmlFor="dateOfEmployment">Date of Employment (YYYY-MM-DD):</label><br />
+                <input type="text" id="dateOfEmployment" name="dateOfEmployment" value={formData.dateOfEmployment} onChange={handleChange} required /><br />
+                <label htmlFor="contractPeriod">Contract Period:</label><br />
+                <input type="text" id="contractPeriod" name="contractPeriod" value={formData.contractPeriod} onChange={handleChange} required /><br />
+                <label htmlFor="job">Job:</label><br />
+                <input type="text" id="job" name="job" value={formData.job} onChange={handleChange} required /><br /><br />
+
+
+                <label htmlFor="passportFile">Passport File:</label><br />
+<input type="file" id="passportFile" name="passportFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+
+<label htmlFor="idCopyFile">ID Copy File:</label><br />
+<input type="file" id="idCopyFile" name="idCopyFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+
+<label htmlFor="chiefLetterFile">Chief Letter File:</label><br />
+<input type="file" id="chiefLetterFile" name="chiefLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+
+<label htmlFor="clearanceLetterFile">Clearance Letter File:</label><br />
+<input type="file" id="clearanceLetterFile" name="clearanceLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+
+<label htmlFor="referenceFile">Reference File:</label><br />
+<input type="file" id="referenceFile" name="referenceFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} /><br /><br />
+
+
+                <button type="submit">Add Employee & Upload Documents</button>
             </form>
         </div>
     );

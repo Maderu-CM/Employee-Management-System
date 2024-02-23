@@ -7,7 +7,7 @@ const ViewEmployees = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMorePages, setHasMorePages] = useState(true);
     const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
-    
+
 
     const fetchEmployees = (page) => {
         fetch(`http://127.0.0.1:5000/employees?page=${page}&pageSize=10`)
@@ -36,7 +36,7 @@ const ViewEmployees = () => {
         fetchEmployees(newPage);
     };
 
-    const handleDeleteEmployee = async (employee_id) => { 
+    const handleDeleteEmployee = async (employee_id) => {
         if (window.confirm('Are you sure you want to delete this employee?')) {
             if (!employee_id) {
                 console.error('Employee ID is undefined');
@@ -51,7 +51,7 @@ const ViewEmployees = () => {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
-            
+
                 if (data.status === 'success') {
                     // Set the notification to true for a short duration
                     setDeleteSuccessNotification(true);
@@ -102,7 +102,7 @@ const ViewEmployees = () => {
                     <tr>
                         <th>Firstname</th>
                         <th>Lastname</th>
-                        <th>Midint</th>
+
                         <th>Contact</th>
                         <th>Action</th>
                     </tr>

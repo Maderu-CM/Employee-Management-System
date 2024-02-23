@@ -12,7 +12,10 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = 'kjsfhiuyrnAUTdjhddjlkjfeadDAlHgDM'
 
 # Adding an employee
-@app.route('/employees', methods=['POST'])
+
+# Adding an employee
+
+@app.route('/addemployee', methods=['POST'])
 def create_employee():
     try:
         data = request.json
@@ -23,7 +26,9 @@ def create_employee():
                            'contractPeriod', 'job']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
-            return jsonify({'error': f'Missing fields: {", ".join(missing_fields)}'}), 400
+            error_message = f'Missing fields: {", ".join(missing_fields)}'
+            print(f'Error adding employee: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 400
 
         # Convert date strings to datetime objects
         date_of_birth = datetime.strptime(data['dateOfBirth'], '%Y-%m-%d')
@@ -32,7 +37,9 @@ def create_employee():
         # Query department based on department name
         department = Assignment.query.filter_by(departmentName=data['departmentname']).first()
         if not department:
-            return jsonify({'error': 'Department not found'}), 404
+            error_message = f'Department not found for department name: {data["departmentname"]}'
+            print(f'Error adding employee: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 404
 
         # Create new employee instance
         new_employee = Employee(
@@ -42,7 +49,7 @@ def create_employee():
             gender=data['gender'],
             contact=data['contact'],
             IdentificationNumber=data['IdentificationNumber'],
-            departmentnumber=department.departmentnumber,  # Use department number obtained from the query
+            departmentnumber=department.departmentnumber,
             dateOfEmployment=date_of_employment,
             contractPeriod=data['contractPeriod'],
             job=data['job']
@@ -52,16 +59,99 @@ def create_employee():
         db.session.add(new_employee)
         db.session.commit()
 
-        return jsonify({'message': 'Employee created successfully'}), 201
+        # Return the employee_id of the newly created employee
+        return jsonify({'message': 'Employee created successfully', 'employee_id': new_employee.id}), 201
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_message = f'An error occurred: {str(e)}'
+        print(f'Error adding employee: {error_message}')  # Print error message to console
+        return jsonify({'error': error_message}), 500
+
+
     
-#document upload
+#uploading new employee's document
+UPLOAD_FOLDER = 'uploads'  
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}  # Allowed file extensions
 
+# Function to check if file extension is allowed
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Route for uploading documents for a specific employee
+# Route for uploading documents for a specific employee
+@app.route('/upload_document/<int:employee_id>', methods=['POST'])
+def upload_document(employee_id):
+    try:
+        # Check if employee exists
+        employee = Employee.query.get(employee_id)
+        if not employee:
+            error_message = f'Employee not found with ID: {employee_id}'
+            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 404
+
+        # Check if the POST request has the file parts
+        if 'passportFile' not in request.files or 'idCopyFile' not in request.files or 'chiefLetterFile' not in request.files or 'clearanceLetterFile' not in request.files or 'referenceFile' not in request.files:
+            error_message = 'One or more files missing in the request'
+            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 400
+
+        passport_file = request.files['passportFile']
+        id_copy_file = request.files['idCopyFile']
+        chief_letter_file = request.files['chiefLetterFile']
+        clearance_letter_file = request.files['clearanceLetterFile']
+        reference_file = request.files['referenceFile']
+
+        # Check if any file is empty
+        if passport_file.filename == '' or id_copy_file.filename == '' or chief_letter_file.filename == '' or clearance_letter_file.filename == '':
+            error_message = 'One or more files are empty'
+            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 400
+
+        # Check if the file extensions are allowed
+        if not all(allowed_file(file.filename) for file in [passport_file, id_copy_file, chief_letter_file, clearance_letter_file, reference_file]):
+            error_message = 'One or more files have disallowed extensions'
+            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            return jsonify({'error': error_message}), 400
+
+        # Create directory if it does not exist
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        # Save the files
+        passport_filepath = os.path.join(UPLOAD_FOLDER, secure_filename(passport_file.filename))
+        id_copy_filepath = os.path.join(UPLOAD_FOLDER, secure_filename(id_copy_file.filename))
+        chief_letter_filepath = os.path.join(UPLOAD_FOLDER, secure_filename(chief_letter_file.filename))
+        clearance_letter_filepath = os.path.join(UPLOAD_FOLDER, secure_filename(clearance_letter_file.filename))
+        reference_filepath = os.path.join(UPLOAD_FOLDER, secure_filename(reference_file.filename))
+
+        passport_file.save(passport_filepath)
+        id_copy_file.save(id_copy_filepath)
+        chief_letter_file.save(chief_letter_filepath)
+        clearance_letter_file.save(clearance_letter_filepath)
+        reference_file.save(reference_filepath)
+
+        # Update document file paths in the database
+        document = Document(
+            employee_id=employee_id,
+            passport_filepath=passport_filepath,
+            IdCopy_filepath=id_copy_filepath,
+            ChiefLetter_filepath=chief_letter_filepath,
+            ClearanceLetter_filepath=clearance_letter_filepath,
+            Reference_filepath=reference_filepath
+        )
+        db.session.add(document)
+        db.session.commit()
+
+        return jsonify({'message': 'Documents uploaded successfully'}), 200
+    except Exception as e:
+        error_message = f'An error occurred: {str(e)}'
+        print(f'Error uploading documents: {error_message}')  # Print error message to console
+        return jsonify({'error': error_message}), 500
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_message = f'An error occurred: {str(e)}'
+        print(f'Error uploading documents: {error_message}')  # Print error message to console
+        return jsonify({'error': error_message}), 500
 
 # Add a assignment
 @app.route('/add_assignment', methods=['POST'])
