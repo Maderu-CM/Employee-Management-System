@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function AddEmployee() {
     const [formData, setFormData] = useState({
@@ -18,6 +18,26 @@ function AddEmployee() {
         clearanceLetterFile: null,
         referenceFile: null
     });
+
+    const [departmentNames, setDepartmentNames] = useState([]);
+
+    useEffect(() => {
+        fetchDepartmentNames();
+    }, []);
+
+    const fetchDepartmentNames = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/select_department');
+            if (!response.ok) {
+                throw new Error('Error fetching department names');
+            }
+            const data = await response.json();
+            setDepartmentNames(data.assignments.map(assignment => assignment.departmentName));
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching department names.');
+        }
+    };
 
     const handleChange = (e) => {
         if (e.target.name === 'passportFile' || e.target.name === 'idCopyFile' || e.target.name === 'chiefLetterFile' || e.target.name === 'clearanceLetterFile' || e.target.name === 'referenceFile') {
@@ -95,16 +115,23 @@ function AddEmployee() {
                 <input type="text" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required /><br />
                 <label htmlFor="gender">Gender:</label><br />
                 <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                </select><br />
+    <option value="select_gender">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+</select><br />
+
                 <label htmlFor="contact">Contact:</label><br />
                 <input type="text" id="contact" name="contact" value={formData.contact} onChange={handleChange} required /><br />
                 <label htmlFor="IdentificationNumber">Identification Number:</label><br />
                 <input type="text" id="IdentificationNumber" name="IdentificationNumber" value={formData.IdentificationNumber} onChange={handleChange} required /><br />
                 <label htmlFor="departmentname">Department Name:</label><br />
-                <input type="text" id="departmentname" name="departmentname" value={formData.departmentname} onChange={handleChange} required /><br />
+                <select id="departmentname" name="departmentname" value={formData.departmentname} onChange={handleChange} required>
+                    <option value="">Select Department</option>
+                    {departmentNames.map((departmentName, index) => (
+                        <option key={index} value={departmentName}>{departmentName}</option>
+                    ))}
+                </select><br />
                 <label htmlFor="dateOfEmployment">Date of Employment (YYYY-MM-DD):</label><br />
                 <input type="text" id="dateOfEmployment" name="dateOfEmployment" value={formData.dateOfEmployment} onChange={handleChange} required /><br />
                 <label htmlFor="contractPeriod">Contract Period:</label><br />
@@ -112,22 +139,20 @@ function AddEmployee() {
                 <label htmlFor="job">Job:</label><br />
                 <input type="text" id="job" name="job" value={formData.job} onChange={handleChange} required /><br /><br />
 
-
                 <label htmlFor="passportFile">Passport File:</label><br />
-<input type="file" id="passportFile" name="passportFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+                <input type="file" id="passportFile" name="passportFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
 
-<label htmlFor="idCopyFile">ID Copy File:</label><br />
-<input type="file" id="idCopyFile" name="idCopyFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+                <label htmlFor="idCopyFile">ID Copy File:</label><br />
+                <input type="file" id="idCopyFile" name="idCopyFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
 
-<label htmlFor="chiefLetterFile">Chief Letter File:</label><br />
-<input type="file" id="chiefLetterFile" name="chiefLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+                <label htmlFor="chiefLetterFile">Chief Letter File:</label><br />
+                <input type="file" id="chiefLetterFile" name="chiefLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
 
-<label htmlFor="clearanceLetterFile">Clearance Letter File:</label><br />
-<input type="file" id="clearanceLetterFile" name="clearanceLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
+                <label htmlFor="clearanceLetterFile">Clearance Letter File:</label><br />
+                <input type="file" id="clearanceLetterFile" name="clearanceLetterFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} required /><br />
 
-<label htmlFor="referenceFile">Reference File:</label><br />
-<input type="file" id="referenceFile" name="referenceFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} /><br /><br />
-
+                <label htmlFor="referenceFile">Reference File:</label><br />
+                <input type="file" id="referenceFile" name="referenceFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} /><br /><br />
 
                 <button type="submit">Add Employee & Upload Documents</button>
             </form>
