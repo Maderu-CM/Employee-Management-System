@@ -112,14 +112,14 @@ function AddEmployee() {
                 <label htmlFor="lastname">Last Name:</label><br />
                 <input type="text" id="lastname" name="lastname" value={formData.lastname} onChange={handleChange} required /><br />
                 <label htmlFor="dateOfBirth">Date of Birth (YYYY-MM-DD):</label><br />
-                <input type="text" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required /><br />
+                <input type="date" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required /><br />
                 <label htmlFor="gender">Gender:</label><br />
                 <select id="gender" name="gender" value={formData.gender} onChange={handleChange} required>
-    <option value="select_gender">Select Gender</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-    <option value="other">Other</option>
-</select><br />
+                    <option value="select_gender">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select><br />
 
                 <label htmlFor="contact">Contact:</label><br />
                 <input type="text" id="contact" name="contact" value={formData.contact} onChange={handleChange} required /><br />
@@ -133,7 +133,7 @@ function AddEmployee() {
                     ))}
                 </select><br />
                 <label htmlFor="dateOfEmployment">Date of Employment (YYYY-MM-DD):</label><br />
-                <input type="text" id="dateOfEmployment" name="dateOfEmployment" value={formData.dateOfEmployment} onChange={handleChange} required /><br />
+                <input type="date" id="dateOfEmployment" name="dateOfEmployment" value={formData.dateOfEmployment} onChange={handleChange} required /><br />
                 <label htmlFor="contractPeriod">Contract Period:</label><br />
                 <input type="text" id="contractPeriod" name="contractPeriod" value={formData.contractPeriod} onChange={handleChange} required /><br />
                 <label htmlFor="job">Job:</label><br />
