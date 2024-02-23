@@ -154,7 +154,7 @@ function AddEmployee() {
                 <label htmlFor="referenceFile">Reference File:</label><br />
                 <input type="file" id="referenceFile" name="referenceFile" accept=".pdf, .png, .jpg, .jpeg, .gif" onChange={handleChange} /><br /><br />
 
-                <button type="submit">Add Employee & Upload Documents</button>
+                <button type="submit">Add Employee</button>
             </form>
         </div>
     );

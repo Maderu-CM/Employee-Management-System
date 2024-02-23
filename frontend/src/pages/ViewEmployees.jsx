@@ -102,8 +102,8 @@ const ViewEmployees = () => {
                     <tr>
                         <th>Firstname</th>
                         <th>Lastname</th>
-
                         <th>Contact</th>
+                        <th>ID Number</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -112,8 +112,9 @@ const ViewEmployees = () => {
                         <tr key={index}>
                             <td>{employee.firstname}</td>
                             <td>{employee.lastname}</td>
-                            <td>{employee.midint}</td>
                             <td>{employee.contact}</td>
+                            <td>{employee.IdentificationNumber}</td>
+                           
                             <td>
                                 <button className="btn btn-success ml-2">VIEW</button>
                                 <button className="btn btn-primary ml-2">EDIT</button>
