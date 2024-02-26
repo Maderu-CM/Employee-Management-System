@@ -7,7 +7,8 @@ import {
     ,
     FaUsers,
     FaSitemap,
-    FaThList
+    FaThList,
+    FaPortrait
 } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 
@@ -32,6 +33,11 @@ const Sidebar = ({ children }) => {
             path: "/viewemployees",
             name: "View Employees",
             icon: <FaUsers />
+        },
+        {
+            path: "/profile",
+            name: "Profile",
+            icon: <FaPortrait />
         },
         {
             path: "/adddepartment",

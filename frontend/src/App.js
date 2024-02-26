@@ -9,7 +9,7 @@ import AddEmployee from './pages/AddEmployee.jsx';
 import AddDepartment from './pages/AddDepartment.jsx';
 import ViewDepartment from './pages/ViewDepartment.jsx';
 import ViewEmployees from './pages/ViewEmployees.jsx';
-
+import Profile from './pages/Profile.jsx';
 
 const App = () => {
   return (
@@ -23,7 +23,7 @@ const App = () => {
           <Route path="/addemployee" element={<AddEmployee />} />
           <Route path="/adddepartment" element={<AddDepartment />} />
           <Route path="/viewdepartment" element={<ViewDepartment />} />
-         
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Sidebar>
     </BrowserRouter>

@@ -511,5 +511,32 @@ def get_employee_details(employee_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
+#search for employee's 
+    
+@app.route('/search_employee', methods=['GET'])
+def search_employee():
+    query = request.args.get('query', '')
+
+  
+    employees = Employee.query.filter(
+        (Employee.firstname.ilike(f'%{query}%')) | (Employee.lastname.ilike(f'%{query}%'))
+    ).all()
+
+    if employees:
+        # Serialize the employee data into a format suitable for JSON
+        employee_data = [
+            {
+                'id': employee.id,
+                'firstname': employee.firstname,
+                'lastname': employee.lastname,
+               
+            }
+            for employee in employees
+        ]
+        return jsonify({'status': 'success', 'employees': employee_data})
+    else:
+        return jsonify({'status': 'error', 'message': 'No employees found'})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
