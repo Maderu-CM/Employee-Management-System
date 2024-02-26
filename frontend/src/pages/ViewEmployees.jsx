@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
+ // Import the EmployeeDetailsModal component
 
 const ViewEmployees = () => {
     const [employees, setEmployees] = useState([]);
@@ -8,7 +9,8 @@ const ViewEmployees = () => {
     const [hasMorePages, setHasMorePages] = useState(true);
     const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [selectedEmployee, setSelectedEmployee] = useState(null); // New state variable
+    
+   
 
     const fetchEmployees = (page) => {
         setLoading(true);
@@ -46,10 +48,10 @@ const ViewEmployees = () => {
             console.error('Invalid employee ID');
             return;
         }
-    
+
         // Debug the value of employeeId
         console.log('Employee ID:', employeeId);
-    
+
         if (window.confirm('Are you sure you want to delete this employee?')) {
             try {
                 const response = await fetch(`http://127.0.0.1:5000/delete_employee/${employeeId}`, {
@@ -58,10 +60,10 @@ const ViewEmployees = () => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-    
+
                 // If the deletion was successful, fetch the updated list of employees
                 fetchEmployees(currentPage);
-    
+
                 // Show delete success notification
                 setDeleteSuccessNotification(true);
                 setTimeout(() => setDeleteSuccessNotification(false), 2000);
@@ -69,30 +71,6 @@ const ViewEmployees = () => {
                 console.error('Fetch error:', error);
                 alert('Error during the fetch request');
             }
-        }
-    };
-    
-
-    // New function to handle viewing employee details
-    const handleViewEmployee = async (employeeId) => {
-        try {
-            const response = await fetch(`http://127.0.0.1:5000/employee_details/${employeeId}`, {
-                method: 'GET',
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                setSelectedEmployee(data.employee); // Set the selected employee details
-                // Display the employee details and documents in a modal or another section of the UI
-            } else {
-                alert(`Error: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('Fetch error:', error);
-            alert('Error during the fetch request');
         }
     };
 
@@ -141,13 +119,7 @@ const ViewEmployees = () => {
                                     <td>{employee.lastname}</td>
                                     <td>{employee.contact}</td>
                                     <td>
-                                        <button className="btn btn-success ml-2" onClick={() => handleViewEmployee(employee.id)}>VIEW</button> {/* Modify VIEW button */}
-                                        <button className="btn btn-primary ml-2">EDIT</button>
-                                        <button
-                                            className="btn btn-danger ml-2"
-                                            onClick={() => handleDeleteEmployee(employee.id)}
-                                            disabled={loading} // Disable delete button while loading
-                                        >
+                                        <button className="btn btn-danger ml-2" onClick={() => handleDeleteEmployee(employee.id)} disabled={loading}>
                                             DELETE
                                         </button>
                                     </td>
@@ -160,7 +132,7 @@ const ViewEmployees = () => {
                         <button
                             className="btn btn-secondary"
                             onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1 || loading} // Disable previous button while loading
+                            disabled={currentPage === 1 || loading}
                         >
                             Previous Page
                         </button>
@@ -168,11 +140,14 @@ const ViewEmployees = () => {
                         <button
                             className="btn btn-secondary"
                             onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={!hasMorePages || loading} // Disable next button while loading or if there are no more pages
+                            disabled={!hasMorePages || loading}
                         >
                             Next Page
                         </button>
                     </div>
+
+                    
+                    
                 </>
             )}
         </div>

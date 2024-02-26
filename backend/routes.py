@@ -490,7 +490,7 @@ def get_employee_details(employee_id):
             'dateOfEmployment': employee.dateOfEmployment.isoformat(),  # Convert to ISO format for JSON serialization
             'contractPeriod': employee.contractPeriod,
             'job': employee.job,
-            'documents': []  # Initialize an empty list for documents
+            'documents': []  
         }
 
         # Populate the documents list with document details
@@ -502,7 +502,7 @@ def get_employee_details(employee_id):
                 'ChiefLetter_filepath': document.ChiefLetter_filepath,
                 'ClearanceLetter_filepath': document.ClearanceLetter_filepath,
                 'Reference_filepath': document.Reference_filepath
-                # Add more fields as needed
+            
             }
             employee_data['documents'].append(document_data)
 
