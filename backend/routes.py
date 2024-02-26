@@ -195,7 +195,7 @@ def view_employees():
         employee_list = []
         for employee in employees:
             employee_data = {
-               
+                'id': employee.id,
                 'firstname': employee.firstname,
                 'lastname': employee.lastname,
                 'contact': employee.contact,
@@ -338,36 +338,6 @@ def delete_employee(employee_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# search for employees based on a specific criteria
-@app.route('/search_employees', methods=['GET'])
-def search_employees():
-    try:
-        # filter parameters
-        filters = {
-            'firstname': request.args.get('firstname', ''),
-            'lastname': request.args.get('lastname', ''),
-            'departmentname': request.args.get('departmentname', ''),
-            'gender': request.args.get('gender', ''),
-            'job': request.args.get('job', ''),
-            'educationlevel': request.args.get('educationlevel', '')
-        }
-
-        query = Employee.query.filter_by(**filters)
-        employees = query.all()
-
-        # results
-        employee_list = []
-        for employee in employees:
-            employee_data = {
-                'firstname': employee.firstname,
-                'lastname': employee.lastname
-            }
-            employee_list.append(employee_data)
-
-        return jsonify({'status': 'success', 'employees': employee_list}), 200
-
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 # fetching assignments
 @app.route('/assignments', methods=['GET'])
@@ -497,8 +467,49 @@ def edit_department(departmentNumber):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+#retrieve employee's details 
+@app.route('/employee_details/<int:employee_id>', methods=['GET'])
+def get_employee_details(employee_id):
+    try:
+        employee = Employee.query.get(employee_id)
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
 
-    
+        # Query documents associated with the employee
+        documents = Document.query.filter_by(employee_id=employee_id).all()
+
+        # Construct a dictionary containing the employee's details
+        employee_data = {
+            'firstname': employee.firstname,
+            'lastname': employee.lastname,
+            'dateOfBirth': employee.dateOfBirth.isoformat(),  # Convert to ISO format for JSON serialization
+            'gender': employee.gender,
+            'contact': employee.contact,
+            'identification_number': employee.identification_number,
+            'department_number': employee.department_number,
+            'dateOfEmployment': employee.dateOfEmployment.isoformat(),  # Convert to ISO format for JSON serialization
+            'contractPeriod': employee.contractPeriod,
+            'job': employee.job,
+            'documents': []  # Initialize an empty list for documents
+        }
+
+        # Populate the documents list with document details
+        for document in documents:
+            document_data = {
+                'id': document.id,
+                'passport_filepath': document.passport_filepath,
+                'IdCopy_filepath': document.IdCopy_filepath,
+                'ChiefLetter_filepath': document.ChiefLetter_filepath,
+                'ClearanceLetter_filepath': document.ClearanceLetter_filepath,
+                'Reference_filepath': document.Reference_filepath
+                # Add more fields as needed
+            }
+            employee_data['documents'].append(document_data)
+
+        return jsonify({'status': 'success', 'employee': employee_data}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
