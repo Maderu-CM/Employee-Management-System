@@ -13,8 +13,6 @@ app.config['JWT_SECRET_KEY'] = 'kjsfhiuyrnAUTdjhddjlkjfeadDAlHgDM'
 
 # Adding an employee
 
-# Adding an employee
-
 @app.route('/addemployee', methods=['POST'])
 def create_employee():
     try:
@@ -22,7 +20,7 @@ def create_employee():
 
         # Validate request data
         required_fields = ['firstname', 'lastname', 'dateOfBirth', 'gender', 'contact',
-                           'IdentificationNumber', 'departmentname', 'dateOfEmployment',
+                           'identification_number', 'department_name', 'dateOfEmployment',
                            'contractPeriod', 'job']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
@@ -35,9 +33,9 @@ def create_employee():
         date_of_employment = datetime.strptime(data['dateOfEmployment'], '%Y-%m-%d')
 
         # Query department based on department name
-        department = Assignment.query.filter_by(departmentName=data['departmentname']).first()
+        department = Assignment.query.filter_by(departmentName=data['department_name']).first()
         if not department:
-            error_message = f'Department not found for department name: {data["departmentname"]}'
+            error_message = f'Department not found for department name: {data["department_name"]}'
             print(f'Error adding employee: {error_message}')  # Print error message to console
             return jsonify({'error': error_message}), 404
 
@@ -48,8 +46,8 @@ def create_employee():
             dateOfBirth=date_of_birth,
             gender=data['gender'],
             contact=data['contact'],
-            IdentificationNumber=data['IdentificationNumber'],
-            departmentnumber=department.departmentnumber,
+            identification_number=data['identification_number'],
+            department_number=department.departmentnumber,
             dateOfEmployment=date_of_employment,
             contractPeriod=data['contractPeriod'],
             job=data['job']
@@ -67,8 +65,6 @@ def create_employee():
         print(f'Error adding employee: {error_message}')  # Print error message to console
         return jsonify({'error': error_message}), 500
 
-
-    
 #uploading new employee's document
 UPLOAD_FOLDER = 'uploads'  
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif'}  # Allowed file extensions
@@ -203,7 +199,7 @@ def view_employees():
                 'firstname': employee.firstname,
                 'lastname': employee.lastname,
                 'contact': employee.contact,
-                'IdentificationNumber':employee. IdentificationNumber,
+              
             }
             employee_list.append(employee_data)
 
@@ -323,17 +319,24 @@ def edit_employee(employee_id):
 @app.route('/delete_employee/<int:employee_id>', methods=['DELETE'])
 def delete_employee(employee_id):
     try:
+        # Retrieve the employee by ID
         employee = Employee.query.get(employee_id)
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Delete the associated documents
+        documents = Document.query.filter_by(employee_id=employee_id).all()
+        for document in documents:
+            db.session.delete(document)
+        
+        # Delete the employee
+        db.session.delete(employee)
+        db.session.commit()
 
-        if employee:
-            db.session.delete(employee)
-            db.session.commit()
+        return jsonify({'message': 'Employee and associated documents deleted successfully'}), 200
 
-            return jsonify({'status': 'success', 'message': 'Employee deleted successfully'}), 200
-        else:
-            return jsonify({'status': 'error', 'message': 'Employee not found'}), 404
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 # search for employees based on a specific criteria
 @app.route('/search_employees', methods=['GET'])

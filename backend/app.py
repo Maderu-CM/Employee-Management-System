@@ -1,12 +1,9 @@
-
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
-from sqlalchemy.orm import relationship
 
 load_dotenv('.flaskenv')
 
@@ -23,31 +20,25 @@ CORS(app)
 migrate = Migrate(app, db)
 
 # Models
-
-
 class Employee(db.Model):
     __tablename__ = 'employee'
 
-    id = db.Column(db.Integer, nullable=False, unique=True,
-                   autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     firstname = db.Column(db.String(30), nullable=False)
-    lastname = db.Column(db.String(30), unique=False, nullable=False)
+    lastname = db.Column(db.String(30), nullable=False)
     dateOfBirth = db.Column(db.DateTime, nullable=False)
     gender = db.Column(db.String(30), nullable=False)
     contact = db.Column(db.String(20), unique=True, nullable=False)
-    IdentificationNumber = db.Column(db.Integer, unique=True, nullable=False)
-    departmentnumber = db.Column(db.Integer, db.ForeignKey(
-        'assignment.departmentnumber'), nullable=False)
+    identification_number = db.Column(db.Integer,nullable=False)
+    department_number = db.Column(db.Integer, db.ForeignKey('assignment.departmentnumber'), nullable=False)
     dateOfEmployment = db.Column(db.DateTime, nullable=False)
     contractPeriod = db.Column(db.Integer, nullable=False)
     job = db.Column(db.String, nullable=False)
 
-    # Define the relationship without cascade on the many side
-    assignment = db.relationship(
-        'Assignment', backref='assignment_relation', lazy=True)
+    # Define the relationship with cascade
+    documents = db.relationship('Document', backref='employee', lazy=True, cascade='all, delete-orphan')
 
-
-class Assignment (db.Model):
+class Assignment(db.Model):
     __tablename__ = 'assignment'
 
     departmentnumber = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -56,25 +47,18 @@ class Assignment (db.Model):
     Location = db.Column(db.String, nullable=False)
 
     # relationship
-    employees = db.relationship(
-        'Employee', backref='assignment_relation', lazy=True, cascade='all, delete-orphan')
-
+    employees = db.relationship('Employee', backref='assignment', lazy=True, cascade='all, delete-orphan')
 
 class Document(db.Model):
     __tablename__ = 'document'
 
-    id = db.Column(db.Integer, nullable=False, unique=True,
-                   autoincrement=True, primary_key=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey(
-        'employee.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id', ondelete='CASCADE'), nullable=False)
     passport_filepath = db.Column(db.String, nullable=False)
     IdCopy_filepath = db.Column(db.String, nullable=False)
     ChiefLetter_filepath = db.Column(db.String, nullable=False)
     ClearanceLetter_filepath = db.Column(db.String, nullable=False)
     Reference_filepath = db.Column(db.String)
-
-    # Define back reference to Employee
-    employee = db.relationship('Employee', backref='document')
 
 import routes
 

@@ -7,8 +7,8 @@ function AddEmployee() {
         dateOfBirth: '',
         gender: '',
         contact: '',
-        IdentificationNumber: '',
-        departmentname: '',
+        identification_number: '',
+        department_name: '',
         dateOfEmployment: '',
         contractPeriod: '',
         job: '',
@@ -123,10 +123,10 @@ function AddEmployee() {
 
                 <label htmlFor="contact">Contact:</label><br />
                 <input type="text" id="contact" name="contact" value={formData.contact} onChange={handleChange} required /><br />
-                <label htmlFor="IdentificationNumber">Identification Number:</label><br />
-                <input type="text" id="IdentificationNumber" name="IdentificationNumber" value={formData.IdentificationNumber} onChange={handleChange} required /><br />
-                <label htmlFor="departmentname">Department Name:</label><br />
-                <select id="departmentname" name="departmentname" value={formData.departmentname} onChange={handleChange} required>
+                <label htmlFor="identification_number">Identification Number:</label><br />
+                <input type="text" id="identification_number" name="identification_number" value={formData.IdentificationNumber} onChange={handleChange} required /><br />
+                <label htmlFor="department_name">Department Name:</label><br />
+                <select id="department_name" name="department_name" value={formData.departmentname} onChange={handleChange} required>
                     <option value="">Select Department</option>
                     {departmentNames.map((departmentName, index) => (
                         <option key={index} value={departmentName}>{departmentName}</option>

@@ -1,8 +1,8 @@
-"""Initial Migration
+"""Initial MIgration
 
-Revision ID: 778ce896500d
+Revision ID: 86f9209b0da9
 Revises: 
-Create Date: 2024-02-22 11:19:12.432906
+Create Date: 2024-02-26 09:45:56.818774
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '778ce896500d'
+revision = '86f9209b0da9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,16 +32,14 @@ def upgrade():
     sa.Column('dateOfBirth', sa.DateTime(), nullable=False),
     sa.Column('gender', sa.String(length=30), nullable=False),
     sa.Column('contact', sa.String(length=20), nullable=False),
-    sa.Column('IdentificationNumber', sa.Integer(), nullable=False),
-    sa.Column('departmentnumber', sa.Integer(), nullable=False),
+    sa.Column('identification_number', sa.Integer(), nullable=False),
+    sa.Column('department_number', sa.Integer(), nullable=False),
     sa.Column('dateOfEmployment', sa.DateTime(), nullable=False),
     sa.Column('contractPeriod', sa.Integer(), nullable=False),
     sa.Column('job', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['departmentnumber'], ['assignment.departmentnumber'], ),
+    sa.ForeignKeyConstraint(['department_number'], ['assignment.departmentnumber'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('IdentificationNumber'),
-    sa.UniqueConstraint('contact'),
-    sa.UniqueConstraint('id')
+    sa.UniqueConstraint('contact')
     )
     op.create_table('document',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -51,9 +49,8 @@ def upgrade():
     sa.Column('ChiefLetter_filepath', sa.String(), nullable=False),
     sa.Column('ClearanceLetter_filepath', sa.String(), nullable=False),
     sa.Column('Reference_filepath', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['employee_id'], ['employee.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
+    sa.ForeignKeyConstraint(['employee_id'], ['employee.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 

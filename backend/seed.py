@@ -51,17 +51,18 @@ def create_fake_employee(count=15):
             reference_filepath = f"{firstname}_{lastname}_referees.pdf"
 
             employee = Employee(
-                firstname=firstname,
-                lastname=lastname,
-                dateOfBirth=date_of_birth,
-                gender=fake.random_element(elements=('Male', 'Female')),
-                contact=contact,
-                IdentificationNumber=identification_number,
-                departmentnumber=department_number,
-                dateOfEmployment=date_of_employment,
-                contractPeriod=contract_period,
-                job=fake.job(),
-            )
+        firstname=firstname,
+        lastname=lastname,
+        dateOfBirth=date_of_birth,
+        gender=fake.random_element(elements=('Male', 'Female')),
+        contact=contact,
+        identification_number=identification_number,  # Correct attribute name
+        department_number=department_number,  # Correct attribute name
+        dateOfEmployment=date_of_employment,
+        contractPeriod=contract_period,
+        job=fake.job(),
+    )
+
             db.session.add(employee)
             db.session.commit()
 
