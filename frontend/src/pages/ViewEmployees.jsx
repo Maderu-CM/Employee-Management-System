@@ -86,16 +86,7 @@ const ViewEmployees = () => {
                 </div>
             )}
 
-            <div>
-                <div className="input-group">
-                    <input type="text" className="form-control" placeholder="Search For Employee" />
-                    <div className="input-group-append">
-                        <button className="btn btn-secondary search-button" type="button">
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </div>
+            
 
             {loading ? (
                 <div>Loading...</div>
