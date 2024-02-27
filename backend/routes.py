@@ -61,7 +61,7 @@ def create_employee():
 
     except Exception as e:
         error_message = f'An error occurred: {str(e)}'
-        print(f'Error adding employee: {error_message}')  # Print error message to console
+        print(f'Error adding employee: {error_message}')  
         return jsonify({'error': error_message}), 500
 
 #uploading new employee's document
@@ -81,13 +81,13 @@ def upload_document(employee_id):
         employee = Employee.query.get(employee_id)
         if not employee:
             error_message = f'Employee not found with ID: {employee_id}'
-            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            print(f'Error uploading documents: {error_message}') 
             return jsonify({'error': error_message}), 404
 
         # Check if the POST request has the file parts
         if 'passportFile' not in request.files or 'idCopyFile' not in request.files or 'chiefLetterFile' not in request.files or 'clearanceLetterFile' not in request.files or 'referenceFile' not in request.files:
             error_message = 'One or more files missing in the request'
-            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            print(f'Error uploading documents: {error_message}')  
             return jsonify({'error': error_message}), 400
 
         passport_file = request.files['passportFile']
@@ -99,13 +99,12 @@ def upload_document(employee_id):
         # Check if any file is empty
         if passport_file.filename == '' or id_copy_file.filename == '' or chief_letter_file.filename == '' or clearance_letter_file.filename == '':
             error_message = 'One or more files are empty'
-            print(f'Error uploading documents: {error_message}')  # Print error message to console
-            return jsonify({'error': error_message}), 400
+            print(f'Error uploading documents: {error_message}')  
 
         # Check if the file extensions are allowed
         if not all(allowed_file(file.filename) for file in [passport_file, id_copy_file, chief_letter_file, clearance_letter_file, reference_file]):
             error_message = 'One or more files have disallowed extensions'
-            print(f'Error uploading documents: {error_message}')  # Print error message to console
+            print(f'Error uploading documents: {error_message}')  
             return jsonify({'error': error_message}), 400
 
         # Create directory if it does not exist
@@ -140,12 +139,12 @@ def upload_document(employee_id):
         return jsonify({'message': 'Documents uploaded successfully'}), 200
     except Exception as e:
         error_message = f'An error occurred: {str(e)}'
-        print(f'Error uploading documents: {error_message}')  # Print error message to console
+        print(f'Error uploading documents: {error_message}')  
         return jsonify({'error': error_message}), 500
 
     except Exception as e:
         error_message = f'An error occurred: {str(e)}'
-        print(f'Error uploading documents: {error_message}')  # Print error message to console
+        print(f'Error uploading documents: {error_message}')  
         return jsonify({'error': error_message}), 500
 
 # Add a assignment
@@ -572,7 +571,7 @@ def update_employee(employee_id):
         return jsonify({'status': 'success', 'message': 'Employee updated successfully'}), 200
     except Exception as e:
         error_message = f"Error updating employee: {str(e)}"
-        print(error_message)  # Print the error message to console for debugging
+        print(error_message)  
         return jsonify({'status': 'error', 'message': error_message}), 500
 
 if __name__ == '__main__':

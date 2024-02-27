@@ -5,7 +5,7 @@ const ViewAssignment = () => {
     const [assignments, setAssignments] = useState([]);
     const [error, setError] = useState('');
     const [deleteSuccessNotification, setDeleteSuccessNotification] = useState(false);
-    const [updateSuccessNotification, setUpdateSuccessNotification] = useState(false); // New state for update success notification
+    const [updateSuccessNotification, setUpdateSuccessNotification] = useState(false); 
     const [editingAssignment, setEditingAssignment] = useState(null);
     const [editedAssignment, setEditedAssignment] = useState({
         departmentName: '',

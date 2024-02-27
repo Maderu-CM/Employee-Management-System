@@ -56,8 +56,8 @@ def create_fake_employee(count=15):
         dateOfBirth=date_of_birth,
         gender=fake.random_element(elements=('Male', 'Female')),
         contact=contact,
-        identification_number=identification_number,  # Correct attribute name
-        department_number=department_number,  # Correct attribute name
+        identification_number=identification_number, 
+        department_number=department_number, 
         dateOfEmployment=date_of_employment,
         contractPeriod=contract_period,
         job=fake.job(),
