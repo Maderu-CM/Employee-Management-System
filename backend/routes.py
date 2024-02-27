@@ -4,7 +4,7 @@ from app import app,db, Employee, Assignment, Document
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-from datetime import datetime
+import datetime
 
 CORS(app)
 
@@ -550,8 +550,8 @@ def update_employee(employee_id):
         data = request.json
 
         # Convert date strings to datetime objects
-        data['dateOfBirth'] = datetime.strptime(data['dateOfBirth'], '%Y-%m-%dT%H:%M:%S')
-        data['dateOfEmployment'] = datetime.strptime(data['dateOfEmployment'], '%Y-%m-%dT%H:%M:%S.%f')
+        data['dateOfBirth'] = datetime.datetime.strptime(data['dateOfBirth'], '%Y-%m-%dT%H:%M:%S')
+        data['dateOfEmployment'] = datetime.datetime.strptime(data['dateOfEmployment'], '%Y-%m-%dT%H:%M:%S')
 
         # Update the employee attributes
         employee.firstname = data.get('firstname', employee.firstname)
