@@ -3,8 +3,6 @@ import {
 
     FaBars,
     FaUserAlt,
-    FaInfoCircle
-    ,
     FaUsers,
     FaSitemap,
     FaThList,
@@ -18,12 +16,6 @@ const Sidebar = ({ children }) => {
     const toggle = () => setIsOpen(!isOpen);
     const menuItem = [
 
-        {
-            path: "/about",
-            name: "About",
-            icon: <FaInfoCircle />
-
-        },
         {
             path: "/addemployee",
             name: "Add Employee",

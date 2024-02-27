@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 function AddAssignment() {
   const [formData, setFormData] = useState({
     departmentName: '',
-    departmentHead: '', // Changed to hold employee ID instead of name
+    departmentHead: '', 
     Location: '', 
   });
-  const [employees, setEmployees] = useState([]); // State variable to hold the list of employees
+  const [employees, setEmployees] = useState([]); 
 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
