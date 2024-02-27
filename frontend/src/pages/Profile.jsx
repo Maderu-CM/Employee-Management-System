@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './style.css';
 
 const Profile = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -6,6 +7,8 @@ const Profile = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editedEmployee, setEditedEmployee] = useState(null);
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
@@ -59,6 +62,40 @@ const Profile = () => {
         }
     };
 
+    const handleEditClick = () => {
+        setEditMode(true);
+        setEditedEmployee({ ...selectedEmployee });
+    };
+
+    const handleSaveClick = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/update_employee/${selectedEmployee.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(editedEmployee),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.status === 'success') {
+                window.location.reload();
+                alert('Employee details updated successfully');
+            } else {
+                setError('Error updating employee details');
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            setError('Error updating employee details');
+        }
+    };
+
+    const handleCancelClick = () => {
+        setEditMode(false);
+    };
+
     return (
         <div>
             <div className="input-group mb-3">
@@ -77,7 +114,6 @@ const Profile = () => {
             </div>
 
             {loading && <div>Loading...</div>}
-
             {error && <div className="alert alert-danger">{error}</div>}
 
             {searchResults.length > 0 && (
@@ -96,29 +132,174 @@ const Profile = () => {
             )}
 
             {selectedEmployee && (
-                <div>
+                <div className="employee-details">
                     <h2>Employee Details</h2>
-                    <p>Firstname: {selectedEmployee.firstname}</p>
-                    <p>Lastname: {selectedEmployee.lastname}</p>
-                    <p>Date of Birth: {selectedEmployee.dateOfBirth}</p>
-                    <p>Gender: {selectedEmployee.gender}</p>
-                    <p>Contact: {selectedEmployee.contact}</p>
-                    <p>Identification Number: {selectedEmployee.identification_number}</p>
-                    <p>Department Number: {selectedEmployee.department_number}</p>
-                    <p>Date of Employment: {selectedEmployee.dateOfEmployment}</p>
-                    <p>Contract Period: {selectedEmployee.contractPeriod}</p>
-                    <p>Job: {selectedEmployee.job}</p>
+                    <div className="details-container">
+                        {editMode ? (
+                            <>
+                                <div className="detail">
+                                    <label>Firstname:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.firstname}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, firstname: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Lastname:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.lastname}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, lastname: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Date of Birth:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.dateOfBirth}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, dateOfBirth: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Gender:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.gender}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, gender: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Contact:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.contact}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, contact: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Identification Number:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.identification_number}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, identification_number: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Department Number:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.department_number}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, department_number: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Date of Employment:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.dateOfEmployment}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, dateOfEmployment: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Contract Period:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.contractPeriod}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, contractPeriod: e.target.value })}
+                                    />
+                                </div>
+                                <div className="detail">
+                                    <label>Job:</label>
+                                    <input
+                                        type="text"
+                                        value={editedEmployee.job}
+                                        onChange={(e) => setEditedEmployee({ ...editedEmployee, job: e.target.value })}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="detail">
+                                    <label>Firstname:</label>
+                                    <p>{selectedEmployee.firstname}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Lastname:</label>
+                                    <p>{selectedEmployee.lastname}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Date of Birth:</label>
+                                    <p>{selectedEmployee.dateOfBirth}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Gender:</label>
+                                    <p>{selectedEmployee.gender}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Contact:</label>
+                                    <p>{selectedEmployee.contact}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Identification Number:</label>
+                                    <p>{selectedEmployee.identification_number}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Department Number:</label>
+                                    <p>{selectedEmployee.department_number}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Date of Employment:</label>
+                                    <p>{selectedEmployee.dateOfEmployment}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Contract Period:</label>
+                                    <p>{selectedEmployee.contractPeriod}</p>
+                                </div>
+                                <div className="detail">
+                                    <label>Job:</label>
+                                    <p>{selectedEmployee.job}</p>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    {!editMode && <button onClick={handleEditClick}>Edit</button>}
+                    {editMode && (
+                        <>
+                            <button onClick={handleSaveClick}>Save</button>
+                            <button onClick={handleCancelClick}>Cancel</button>
+                        </>
+                    )}
+                </div>
+            )}
 
+
+
+
+
+            {selectedEmployee && (
+                <div>
                     <h2>Documents</h2>
-                    <ul>
+                    <ul className="documents-list">
                         {selectedEmployee.documents.map((document) => (
-                            <li key={document.id}>
-                                Document ID: {document.id}<br />
-                                Passport Filepath: {document.passport_filepath}<br />
-                                ID Copy Filepath: {document.IdCopy_filepath}<br />
-                                Chief Letter Filepath: {document.ChiefLetter_filepath}<br />
-                                Clearance Letter Filepath: {document.ClearanceLetter_filepath}<br />
-                                Reference Filepath: {document.Reference_filepath}
+                            <li key={document.id} className="document-card">
+                                <div className="document-info">
+                                    <div className="document-info-item">
+                                        <strong>Passport:</strong> {document.passport_filepath}
+                                    </div>
+                                    <div className="document-info-item">
+                                        <strong>ID Copy:</strong> {document.IdCopy_filepath}
+                                    </div>
+                                    <div className="document-info-item">
+                                        <strong>Chief Letter:</strong> {document.ChiefLetter_filepath}
+                                    </div>
+                                    <div className="document-info-item">
+                                        <strong>Clearance Letter:</strong> {document.ClearanceLetter_filepath}
+                                    </div>
+                                    <div className="document-info-item">
+                                        <strong>Reference:</strong> {document.Reference_filepath}
+                                    </div>
+                                </div>
                             </li>
                         ))}
                     </ul>

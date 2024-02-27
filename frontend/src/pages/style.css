@@ -22,3 +22,50 @@
     text-align: center;
     color: blue;
 }
+
+
+.documents-list {
+    list-style: none;
+    padding: 0;
+}
+
+.document-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.document-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.document-info-item {
+    margin-bottom: 5px;
+}
+
+.employee-details {
+    margin-top: 20px;
+}
+
+.details-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.detail {
+    margin-bottom: 10px;
+}
+
+.detail label {
+    font-weight: bold;
+}
+
+.detail p {
+    margin: 0;
+}
+
+

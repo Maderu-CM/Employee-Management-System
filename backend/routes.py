@@ -4,7 +4,6 @@ from app import app,db, Employee, Assignment, Document
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-
 from datetime import datetime
 
 CORS(app)
@@ -480,6 +479,7 @@ def get_employee_details(employee_id):
 
         # Construct a dictionary containing the employee's details
         employee_data = {
+            'id': employee.id,
             'firstname': employee.firstname,
             'lastname': employee.lastname,
             'dateOfBirth': employee.dateOfBirth.isoformat(),  # Convert to ISO format for JSON serialization
@@ -537,6 +537,43 @@ def search_employee():
     else:
         return jsonify({'status': 'error', 'message': 'No employees found'})
 
+
+#edit and update employee details
+@app.route('/update_employee/<int:employee_id>', methods=['PUT'])
+def update_employee(employee_id):
+    try:
+        # Fetch the employee from the database
+        employee = Employee.query.get(employee_id)
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+
+        # Parse the request data
+        data = request.json
+
+        # Convert date strings to datetime objects
+        data['dateOfBirth'] = datetime.strptime(data['dateOfBirth'], '%Y-%m-%dT%H:%M:%S')
+        data['dateOfEmployment'] = datetime.strptime(data['dateOfEmployment'], '%Y-%m-%dT%H:%M:%S.%f')
+
+        # Update the employee attributes
+        employee.firstname = data.get('firstname', employee.firstname)
+        employee.lastname = data.get('lastname', employee.lastname)
+        employee.dateOfBirth = data.get('dateOfBirth', employee.dateOfBirth)
+        employee.gender = data.get('gender', employee.gender)
+        employee.contact = data.get('contact', employee.contact)
+        employee.identification_number = data.get('identification_number', employee.identification_number)
+        employee.department_number = data.get('department_number', employee.department_number)
+        employee.dateOfEmployment = data.get('dateOfEmployment', employee.dateOfEmployment)
+        employee.contractPeriod = data.get('contractPeriod', employee.contractPeriod)
+        employee.job = data.get('job', employee.job)
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        return jsonify({'status': 'success', 'message': 'Employee updated successfully'}), 200
+    except Exception as e:
+        error_message = f"Error updating employee: {str(e)}"
+        print(error_message)  # Print the error message to console for debugging
+        return jsonify({'status': 'error', 'message': error_message}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

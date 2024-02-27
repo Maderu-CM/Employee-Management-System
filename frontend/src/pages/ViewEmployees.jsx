@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
- // Import the EmployeeDetailsModal component
+ 
 
 const ViewEmployees = () => {
     const [employees, setEmployees] = useState([]);

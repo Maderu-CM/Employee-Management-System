@@ -75,8 +75,7 @@ function AddEmployee() {
             }
 
             const employeeResult = await employeeResponse.json();
-            const employeeId = employeeResult.employee_id; // Corrected to access the employee_id
-
+            const employeeId = employeeResult.employee_id; 
             alert('Employee added successfully!');
 
             // Upload documents

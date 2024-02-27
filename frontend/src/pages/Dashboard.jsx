@@ -16,36 +16,7 @@ const Dashboard = () => {
                     </p>
                 </div>
 
-                <div>
-                    <h3>Feedback</h3>
-                    <form>
-                        <div className="form-group">
-                            <label htmlFor="email">Email</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-sm"
-                                id="email"
-                                name="email"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="message">Message</label>
-                            <input
-                                type="text"
-                                className="form-control form-control-lg"
-                                id="message"
-                                name="message"
-                            />
-                        </div>
-
-                        <div className="text-center">
-                            <button className="btn btn-primary">
-                                Send Message
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                
             </div>
         </div>
     );
