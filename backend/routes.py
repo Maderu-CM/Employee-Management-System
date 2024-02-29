@@ -4,7 +4,7 @@ from app import app,db, Employee, Assignment, Document
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-import datetime
+from datetime import datetime
 
 CORS(app)
 
@@ -538,6 +538,10 @@ def search_employee():
 
 
 #edit and update employee details
+from datetime import datetime
+
+from datetime import datetime
+
 @app.route('/update_employee/<int:employee_id>', methods=['PUT'])
 def update_employee(employee_id):
     try:
@@ -550,18 +554,22 @@ def update_employee(employee_id):
         data = request.json
 
         # Convert date strings to datetime objects
-        data['dateOfBirth'] = datetime.datetime.strptime(data['dateOfBirth'], '%Y-%m-%dT%H:%M:%S')
-        data['dateOfEmployment'] = datetime.datetime.strptime(data['dateOfEmployment'], '%Y-%m-%dT%H:%M:%S')
+        # Handle milliseconds in the date strings
+        date_of_birth_str = data['dateOfBirth']
+        date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%dT%H:%M:%S.%f')
+
+        date_of_employment_str = data['dateOfEmployment']
+        date_of_employment = datetime.strptime(date_of_employment_str, '%Y-%m-%dT%H:%M:%S.%f')
 
         # Update the employee attributes
         employee.firstname = data.get('firstname', employee.firstname)
         employee.lastname = data.get('lastname', employee.lastname)
-        employee.dateOfBirth = data.get('dateOfBirth', employee.dateOfBirth)
+        employee.dateOfBirth = date_of_birth
         employee.gender = data.get('gender', employee.gender)
         employee.contact = data.get('contact', employee.contact)
         employee.identification_number = data.get('identification_number', employee.identification_number)
         employee.department_number = data.get('department_number', employee.department_number)
-        employee.dateOfEmployment = data.get('dateOfEmployment', employee.dateOfEmployment)
+        employee.dateOfEmployment = date_of_employment
         employee.contractPeriod = data.get('contractPeriod', employee.contractPeriod)
         employee.job = data.get('job', employee.job)
 
@@ -573,6 +581,7 @@ def update_employee(employee_id):
         error_message = f"Error updating employee: {str(e)}"
         print(error_message)  
         return jsonify({'status': 'error', 'message': error_message}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
