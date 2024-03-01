@@ -538,9 +538,6 @@ def search_employee():
 
 
 #edit and update employee details
-from datetime import datetime
-
-from datetime import datetime
 
 @app.route('/update_employee/<int:employee_id>', methods=['PUT'])
 def update_employee(employee_id):
@@ -556,9 +553,11 @@ def update_employee(employee_id):
         # Convert date strings to datetime objects
         # Handle milliseconds in the date strings
         date_of_birth_str = data['dateOfBirth']
+        date_of_birth_str = date_of_birth_str.replace('Z', '')  # Remove 'Z' character if present
         date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%dT%H:%M:%S.%f')
 
         date_of_employment_str = data['dateOfEmployment']
+        date_of_employment_str = date_of_employment_str.replace('Z', '')  # Remove 'Z' character if present
         date_of_employment = datetime.strptime(date_of_employment_str, '%Y-%m-%dT%H:%M:%S.%f')
 
         # Update the employee attributes
@@ -567,10 +566,13 @@ def update_employee(employee_id):
         employee.dateOfBirth = date_of_birth
         employee.gender = data.get('gender', employee.gender)
         employee.contact = data.get('contact', employee.contact)
-        employee.identification_number = data.get('identification_number', employee.identification_number)
-        employee.department_number = data.get('department_number', employee.department_number)
+        employee.identification_number = data.get(
+            'identification_number', employee.identification_number)
+        employee.department_number = data.get(
+            'department_number', employee.department_number)
         employee.dateOfEmployment = date_of_employment
-        employee.contractPeriod = data.get('contractPeriod', employee.contractPeriod)
+        employee.contractPeriod = data.get(
+            'contractPeriod', employee.contractPeriod)
         employee.job = data.get('job', employee.job)
 
         # Commit the changes to the database
@@ -579,7 +581,7 @@ def update_employee(employee_id):
         return jsonify({'status': 'success', 'message': 'Employee updated successfully'}), 200
     except Exception as e:
         error_message = f"Error updating employee: {str(e)}"
-        print(error_message)  
+        print(error_message)
         return jsonify({'status': 'error', 'message': error_message}), 500
 
 
