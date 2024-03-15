@@ -52,7 +52,7 @@ const ViewEmployees = () => {
         // Debug the value of employeeId
         console.log('Employee ID:', employeeId);
 
-        if (window.confirm('Are you sure you want to delete this employee?')) {
+        if (window.confirm('Are you sure you want to fire this employee?')) {
             try {
                 const response = await fetch(`http://127.0.0.1:5000/delete_employee/${employeeId}`, {
                     method: 'DELETE',
@@ -82,7 +82,7 @@ const ViewEmployees = () => {
         <div>
             {deleteSuccessNotification && (
                 <div className="alert alert-success">
-                    Employee deleted successfully!
+                    Employee fired successfully!
                 </div>
             )}
 
@@ -111,7 +111,7 @@ const ViewEmployees = () => {
                                     <td>{employee.contact}</td>
                                     <td>
                                         <button className="btn btn-danger ml-2" onClick={() => handleDeleteEmployee(employee.id)} disabled={loading}>
-                                            DELETE
+                                           DELETE
                                         </button>
                                     </td>
                                 </tr>
